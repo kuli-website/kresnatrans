@@ -259,6 +259,25 @@ a {
         min-height: auto;
         padding: 5rem 0 3rem;
     }
+    
+    .hero-section .row {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .hero-section .col-lg-7 {
+        order: 2;
+    }
+    
+    .hero-section .col-lg-5 {
+        order: 1;
+        margin-bottom: 2rem;
+    }
+    
+    .hero-image-wrapper {
+        margin-top: 0;
+        margin-bottom: 1.5rem;
+    }
 }
 
 @media (max-width: 575.98px) {
@@ -1050,7 +1069,8 @@ section {
     }
     
     .hero-image-wrapper {
-        margin-top: 2rem;
+        margin-top: 0;
+        margin-bottom: 1.5rem;
     }
     
     .scroll-indicator {
