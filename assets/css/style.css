@@ -81,10 +81,18 @@ a {
     transition: var(--transition);
 }
 
+.navbar-logo {
+    height: 45px;
+    width: auto;
+    max-width: 200px;
+    object-fit: contain;
+    transition: var(--transition);
+}
+
 .navbar-brand img {
     transition: var(--transition);
     max-width: 100%;
-    height: 10px;
+    height: auto;
 }
 
 @media (max-width: 991.98px) {
@@ -880,8 +888,9 @@ section {
         margin-top: 0;
     }
     
-    .navbar-brand img {
-        height: 70px;
+    .navbar-logo {
+        height: 40px;
+        max-width: 180px;
     }
     
     .about-stats {
@@ -914,8 +923,9 @@ section {
         padding: 0.75rem 0;
     }
     
-    .navbar-brand img {
-        height: 60px;
+    .navbar-logo {
+        height: 38px;
+        max-width: 160px;
     }
     
     .navbar-scrolled {
@@ -1080,8 +1090,9 @@ section {
         padding-right: 1rem;
     }
     
-    .navbar-brand img {
-        height: 50px;
+    .navbar-logo {
+        height: 35px;
+        max-width: 140px;
     }
     
     .hero-section {
