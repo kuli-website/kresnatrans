@@ -84,7 +84,7 @@ a {
 .navbar-logo {
     height: 20px;
     width: auto;
-    max-width: 100px;
+    max-width: 50px;
     object-fit: contain;
     transition: var(--transition);
 }
