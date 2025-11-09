@@ -48,23 +48,11 @@ body {
     padding-right: 0;
 }
 
-/* Ensure all containers are full width on mobile */
+/* Container adjustments for mobile */
 @media (max-width: 991.98px) {
     .container {
-        width: 100% !important;
-        max-width: 100% !important;
         padding-left: 1rem;
         padding-right: 1rem;
-    }
-    
-    .row {
-        margin-left: 0;
-        margin-right: 0;
-    }
-    
-    [class*="col-"] {
-        padding-left: 0.75rem;
-        padding-right: 0.75rem;
     }
 }
 
@@ -114,18 +102,6 @@ a {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    width: 100%;
-    max-width: 100%;
-    padding-left: 1rem;
-    padding-right: 1rem;
-    margin: 0;
-}
-
-@media (max-width: 991.98px) {
-    .navbar .container {
-        padding-left: 1rem;
-        padding-right: 1rem;
-    }
 }
 
 .navbar-brand {
@@ -316,18 +292,6 @@ a {
 .hero-section .container {
     position: relative;
     z-index: 3;
-    width: 100%;
-    max-width: 100%;
-}
-
-@media (max-width: 991.98px) {
-    .hero-section .container,
-    section .container {
-        width: 100%;
-        max-width: 100%;
-        padding-left: 1rem;
-        padding-right: 1rem;
-    }
 }
 
 .hero-badge {
@@ -489,8 +453,6 @@ a {
 
 section {
     padding: 4rem 0;
-    width: 100%;
-    max-width: 100%;
     overflow-x: hidden;
 }
 
