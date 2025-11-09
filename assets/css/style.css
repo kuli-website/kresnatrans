@@ -91,7 +91,7 @@ a {
 
 .navbar-brand img {
     transition: var(--transition);
-    max-width: 10px;
+    max-width: 17%;
     height: auto;
 }
 
