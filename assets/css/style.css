@@ -274,8 +274,8 @@ a {
     align-items: center;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     overflow: hidden;
-    width: 100%;
-    max-width: 100%;
+    /* width: 100%;
+    max-width: 100%; */
 }
 
 @media (max-width: 767.98px) {
