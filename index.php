@@ -130,7 +130,7 @@
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg fixed-top" id="mainNavbar">
-        <div class="container-fluid">
+        <div class="container">
             <a class="navbar-brand" href="#home">
                 <img src="img/logobus.png" alt="Sewa Bus Jogja - Rental Bus Yogyakarta" class="navbar-logo">
             </a>
