@@ -32,7 +32,8 @@ body {
     color: var(--text-dark);
     line-height: 1.6;
     overflow-x: hidden;
-    padding-top: 80px;
+    padding-top: 75px;
+    font-size: 0.95rem;
 }
 
 /* ============================================
@@ -63,35 +64,35 @@ a {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
     box-shadow: var(--shadow-sm);
-    padding: 1rem 0;
+    padding: 0.75rem 0;
     transition: var(--transition);
 }
 
 .navbar-scrolled {
     background: rgba(255, 255, 255, 0.98);
     box-shadow: var(--shadow-md);
-    padding: 0.75rem 0;
+    padding: 0.6rem 0;
 }
 
 .navbar-brand {
     font-weight: 700;
-    font-size: 1.5rem;
+    font-size: 1.35rem;
     display: flex;
     align-items: center;
     transition: var(--transition);
 }
 
 .navbar-logo {
-    height: 7px;
+    height: 40px;
     width: auto;
-    max-width: 7px;
+    max-width: 180px;
     object-fit: contain;
     transition: var(--transition);
 }
 
 .navbar-brand img {
     transition: var(--transition);
-    max-width: 19%;
+    max-width: 100%;
     height: auto;
 }
 
@@ -209,17 +210,17 @@ a {
 }
 
 .hero-title {
-    font-size: 3.5rem;
+    font-size: 3rem;
     font-weight: 800;
     color: white;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.25rem;
     line-height: 1.2;
 }
 
 .hero-subtitle {
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     color: rgba(255, 255, 255, 0.9);
-    margin-bottom: 2rem;
+    margin-bottom: 1.75rem;
     max-width: 600px;
 }
 
@@ -302,10 +303,11 @@ a {
 
 .btn {
     border-radius: 8px;
-    padding: 0.75rem 1.5rem;
+    padding: 0.65rem 1.25rem;
     font-weight: 600;
     transition: var(--transition);
     border: none;
+    font-size: 0.95rem;
 }
 
 .btn-primary {
@@ -344,8 +346,8 @@ a {
 }
 
 .btn-lg {
-    padding: 1rem 2rem;
-    font-size: 1.125rem;
+    padding: 0.875rem 1.75rem;
+    font-size: 1.05rem;
 }
 
 /* ============================================
@@ -353,28 +355,28 @@ a {
    ============================================ */
 
 section {
-    padding: 5rem 0;
+    padding: 4rem 0;
 }
 
 .section-label {
     display: inline-block;
     color: var(--primary-color);
     font-weight: 600;
-    font-size: 0.875rem;
+    font-size: 0.8rem;
     text-transform: uppercase;
     letter-spacing: 1px;
     margin-bottom: 0.5rem;
 }
 
 .section-title {
-    font-size: 2.5rem;
+    font-size: 2.25rem;
     font-weight: 800;
     color: var(--text-dark);
-    margin-bottom: 1rem;
+    margin-bottom: 0.875rem;
 }
 
 .section-description {
-    font-size: 1.125rem;
+    font-size: 1rem;
     color: var(--text-gray);
     max-width: 700px;
 }
@@ -398,7 +400,7 @@ section {
 }
 
 .stat-item h3 {
-    font-size: 2.5rem;
+    font-size: 2.25rem;
     font-weight: 800;
     color: var(--primary-color);
     margin-bottom: 0.5rem;
@@ -418,8 +420,8 @@ section {
 
 .feature-box {
     display: flex;
-    gap: 1.5rem;
-    padding: 1.5rem;
+    gap: 1.25rem;
+    padding: 1.25rem;
     background: var(--bg-light);
     border-radius: 12px;
     transition: var(--transition);
@@ -431,20 +433,20 @@ section {
 }
 
 .feature-icon {
-    width: 60px;
-    height: 60px;
+    width: 55px;
+    height: 55px;
     background: var(--primary-color);
     color: white;
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     flex-shrink: 0;
 }
 
 .feature-content h4 {
-    font-size: 1.25rem;
+    font-size: 1.15rem;
     font-weight: 700;
     margin-bottom: 0.5rem;
     color: var(--text-dark);
@@ -511,17 +513,17 @@ section {
 }
 
 .armada-body {
-    padding: 1.5rem;
+    padding: 1.25rem;
     flex-grow: 1;
     display: flex;
     flex-direction: column;
 }
 
 .armada-name {
-    font-size: 1.5rem;
+    font-size: 1.35rem;
     font-weight: 700;
     color: var(--text-dark);
-    margin-bottom: 1rem;
+    margin-bottom: 0.875rem;
 }
 
 .armada-features {
@@ -556,7 +558,7 @@ section {
     background: white;
     border: 2px solid var(--border-color);
     border-radius: 16px;
-    padding: 2rem;
+    padding: 1.75rem;
     text-align: center;
     transition: var(--transition);
     height: 100%;
@@ -591,14 +593,14 @@ section {
 }
 
 .package-header {
-    margin-bottom: 2rem;
+    margin-bottom: 1.75rem;
 }
 
 .package-header h3 {
-    font-size: 1.5rem;
+    font-size: 1.35rem;
     font-weight: 700;
     color: var(--text-dark);
-    margin-bottom: 1rem;
+    margin-bottom: 0.875rem;
 }
 
 .package-price {
@@ -616,7 +618,7 @@ section {
 }
 
 .price-amount {
-    font-size: 2.5rem;
+    font-size: 2.25rem;
     font-weight: 800;
     color: var(--primary-color);
 }
@@ -669,16 +671,16 @@ section {
 .contact-card {
     background: white;
     border-radius: 16px;
-    padding: 2.5rem;
+    padding: 2rem;
     box-shadow: var(--shadow-md);
     height: 100%;
 }
 
 .contact-card-title {
-    font-size: 1.5rem;
+    font-size: 1.35rem;
     font-weight: 700;
     color: var(--text-dark);
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.25rem;
 }
 
 .contact-form .form-label {
