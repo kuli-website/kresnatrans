@@ -84,7 +84,7 @@ a {
 .navbar-brand img {
     transition: var(--transition);
     max-width: 100%;
-    height: 50px;
+    height: 10px;
 }
 
 @media (max-width: 991.98px) {
