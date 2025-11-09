@@ -166,7 +166,7 @@
     <section id="home" class="hero-section">
         <div class="hero-overlay"></div>
         <div class="container">
-            <div class="row align-items-center min-vh-100">
+            <div class="row align-items-center">
                 <div class="col-lg-7" data-aos="fade-up" data-aos-duration="1000">
                     <span class="hero-badge">Layanan Terpercaya Sejak 2010</span>
                     <h1 class="hero-title">Sewa Bus Jogja Premium untuk Perjalanan Anda</h1>
