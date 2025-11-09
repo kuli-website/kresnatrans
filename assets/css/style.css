@@ -73,6 +73,12 @@ a {
     justify-content: space-between;
     align-items: center;
     width: 100%;
+    flex-wrap: nowrap;
+}
+
+.navbar-collapse {
+    flex-basis: auto;
+    flex-grow: 0;
 }
 
 .navbar-scrolled {
@@ -942,6 +948,14 @@ section {
         margin-left: auto;
         flex-shrink: 0;
         order: 2;
+        border: none;
+        padding: 0.25rem 0.5rem;
+    }
+    
+    .navbar-collapse {
+        order: 3;
+        width: 100%;
+        flex-basis: 100%;
     }
     
     .navbar-logo {
@@ -1172,6 +1186,14 @@ section {
         margin-left: auto;
         flex-shrink: 0;
         order: 2;
+        border: none;
+        padding: 0.25rem 0.5rem;
+    }
+    
+    .navbar-collapse {
+        order: 3;
+        width: 100%;
+        flex-basis: 100%;
     }
     
     .navbar-logo {
