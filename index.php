@@ -18,7 +18,10 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top shadow-sm">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="#">kresna utama trans wisata</a>
+            <a class="navbar-brand" href="#">
+                <img src="img/logobus.png" alt="Kresna Utama Trans Wisata" height="40" class="d-inline-block align-text-top">
+                <span class="visually-hidden">Kresna Utama Trans Wisata</span>
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
