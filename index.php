@@ -156,7 +156,7 @@
                         <a class="nav-link" href="#contact">Kontak</a>
                     </li>
                     <li class="nav-item ms-lg-3">
-                        <a href="#contact" class="btn btn-primary btn-cta">Booking Sekarang</a>
+                        <a href="#contact" class="btn btn-primary btn-cta">Booking</a>
                     </li>
                 </ul>
             </div>
