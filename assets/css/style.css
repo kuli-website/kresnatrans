@@ -83,16 +83,16 @@ a {
 }
 
 .navbar-logo {
-    height: 7px;
+    height: 40px;
     width: auto;
-    max-width: 7px;
+    max-width: 180px;
     object-fit: contain;
     transition: var(--transition);
 }
 
 .navbar-brand img {
     transition: var(--transition);
-    max-width: 19%;
+    max-width: 100%;
     height: auto;
 }
 
@@ -711,7 +711,9 @@ section {
     display: flex;
     gap: 1rem;
     align-items: flex-start;
+    padding: 0.75rem 0;
 }
+
 
 .contact-icon {
     width: 50px;
@@ -903,15 +905,6 @@ section {
         font-size: 2rem;
     }
     
-    .contact-item {
-        flex-direction: column;
-        text-align: center;
-        gap: 0.75rem;
-    }
-    
-    .contact-icon {
-        margin: 0 auto;
-    }
 }
 
 /* Small devices (landscape phones, less than 768px) */
@@ -1056,6 +1049,52 @@ section {
     
     .contact-form .form-control {
         font-size: 0.95rem;
+    }
+    
+    .contact-info {
+        gap: 1rem;
+    }
+    
+    .contact-item {
+        flex-direction: row;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: var(--bg-light);
+        border-radius: 12px;
+        margin-bottom: 0.75rem;
+    }
+    
+    .contact-item:last-child {
+        margin-bottom: 0;
+    }
+    
+    .contact-icon {
+        flex-shrink: 0;
+        width: 48px;
+        height: 48px;
+        font-size: 1.2rem;
+        margin: 0;
+    }
+    
+    .contact-details {
+        flex: 1;
+        text-align: left;
+        min-width: 0;
+    }
+    
+    .contact-details h5 {
+        margin-bottom: 0.35rem;
+        font-size: 0.95rem;
+        font-weight: 600;
+    }
+    
+    .contact-details p,
+    .contact-details a {
+        font-size: 0.9rem;
+        line-height: 1.5;
+        word-break: break-word;
+        display: block;
     }
     
     .social-links {
@@ -1212,18 +1251,24 @@ section {
     }
     
     .contact-icon {
-        width: 45px;
-        height: 45px;
-        font-size: 1.125rem;
+        width: 44px;
+        height: 44px;
+        font-size: 1.1rem;
+    }
+    
+    .contact-item {
+        padding: 0.875rem;
+        gap: 0.875rem;
     }
     
     .contact-details h5 {
-        font-size: 0.95rem;
+        font-size: 0.9rem;
+        margin-bottom: 0.3rem;
     }
     
     .contact-details p,
     .contact-details a {
-        font-size: 0.875rem;
+        font-size: 0.85rem;
     }
     
     .social-link {
