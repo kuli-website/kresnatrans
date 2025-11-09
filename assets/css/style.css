@@ -93,7 +93,7 @@ a {
 .navbar-logo {
     height: 30px;
     width: auto;
-    max-width: 70px;
+    max-width: 100px; 
     object-fit: contain;
     display: block;
 }
