@@ -131,7 +131,7 @@
     <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNavbar">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="#home">
-                <img src="img/logobus.png" alt="Sewa Bus Jogja" height="90" class="me-2">
+                <img src="img/logobus.png" alt="Sewa Bus Jogja" height="50" class="me-2">
                 <span class="brand-text"></span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
