@@ -82,9 +82,9 @@ a {
 }
 
 .navbar-logo {
-    height: 45px;
+    height: 20px;
     width: auto;
-    max-width: 200px;
+    max-width: 100px;
     object-fit: contain;
     transition: var(--transition);
 }
