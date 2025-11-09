@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sewa Bus Jogja - Transportasi Aman dan Sangess</title>
+    <title>Sewa Bus Jogja - Transportasi Aman dan Sange</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -49,7 +49,7 @@
         <div class="container h-100">
             <div class="row h-100 align-items-center">
                 <div class="col-md-6" data-aos="fade-right">
-                    <h1 class="display-4 fw-bold">Sewa Bus Jogja</h1>
+                    <h1 class="display-4 fw-bold">Sewa Bus Jogjakarta</h1>
                     <p class="lead">Layanan transportasi bus premium untuk perjalanan Anda yang aman dan nyaman di Yogyakarta dan sekitarnya.</p>
                     <a href="#contact" class="btn btn-primary btn-lg">Hubungi Kami</a>
                 </div>
