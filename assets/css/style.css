@@ -68,6 +68,13 @@ a {
     transition: var(--transition);
 }
 
+.navbar .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
 .navbar-scrolled {
     background: rgba(255, 255, 255, 0.98);
     box-shadow: var(--shadow-md);
@@ -80,6 +87,8 @@ a {
     display: flex;
     align-items: center;
     transition: var(--transition);
+    flex-shrink: 0;
+    margin-right: auto;
 }
 
 .navbar-logo {
@@ -92,7 +101,7 @@ a {
 
 .navbar-brand img {
     transition: var(--transition);
-    max-width: 20%;
+    max-width: 17%;
     height: auto;
 }
 
@@ -918,6 +927,23 @@ section {
         padding: 0.75rem 0;
     }
     
+    .navbar .container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .navbar-brand {
+        margin-right: auto;
+        flex-shrink: 0;
+    }
+    
+    .navbar-toggler {
+        margin-left: auto;
+        flex-shrink: 0;
+        order: 2;
+    }
+    
     .navbar-logo {
         height: 38px;
         max-width: 160px;
@@ -1129,6 +1155,23 @@ section {
     .container {
         padding-left: 1rem;
         padding-right: 1rem;
+    }
+    
+    .navbar .container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .navbar-brand {
+        margin-right: auto;
+        flex-shrink: 0;
+    }
+    
+    .navbar-toggler {
+        margin-left: auto;
+        flex-shrink: 0;
+        order: 2;
     }
     
     .navbar-logo {
