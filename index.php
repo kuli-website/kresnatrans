@@ -4,17 +4,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sewa Bus Jogja - Layanan Transportasi Premium & Terpercaya</title>
+    
+    <!-- Primary Meta Tags -->
+    <title>Sewa Bus Jogja - Rental Bus Yogyakarta | Armada Premium & Profesional 2024</title>
+    <meta name="title" content="Sewa Bus Jogja - Rental Bus Yogyakarta | Armada Premium & Profesional 2024">
+    <meta name="description" content="Sewa Bus Jogja terpercaya sejak 2010. Layanan rental bus Yogyakarta dengan armada modern, driver profesional, harga terjangkau. Melayani wisata, dinas, acara keluarga. Big Bus 59 kursi, Medium Bus 35 kursi, Mini Bus 25 kursi. Hubungi sekarang!">
+    <meta name="keywords" content="sewa bus jogja, rental bus jogja, sewa bus yogyakarta, rental bus yogyakarta, sewa bus murah jogja, sewa bus pariwisata jogja, sewa bus wisata jogja, rental bus murah jogja, sewa big bus jogja, sewa medium bus jogja, sewa mini bus jogja, paket wisata jogja, city tour jogja, sewa bus dinas jogja, sewa bus acara jogja">
+    <meta name="author" content="Sewa Bus Jogja">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="Indonesian">
+    <meta name="revisit-after" content="7 days">
+    <meta name="rating" content="general">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.sewabusjogja.com/">
+    <meta property="og:title" content="Sewa Bus Jogja - Rental Bus Yogyakarta | Armada Premium & Profesional">
+    <meta property="og:description" content="Sewa Bus Jogja terpercaya sejak 2010. Layanan rental bus Yogyakarta dengan armada modern, driver profesional, harga terjangkau. Melayani wisata, dinas, acara keluarga.">
+    <meta property="og:image" content="https://www.sewabusjogja.com/img/bus1.png">
+    <meta property="og:locale" content="id_ID">
+    <meta property="og:site_name" content="Sewa Bus Jogja">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://www.sewabusjogja.com/">
+    <meta property="twitter:title" content="Sewa Bus Jogja - Rental Bus Yogyakarta | Armada Premium & Profesional">
+    <meta property="twitter:description" content="Sewa Bus Jogja terpercaya sejak 2010. Layanan rental bus Yogyakarta dengan armada modern, driver profesional, harga terjangkau.">
+    <meta property="twitter:image" content="https://www.sewabusjogja.com/img/bus1.png">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://www.sewabusjogja.com/">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="img/logobus.png">
+    
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" preconnect>
     <!-- AOS CSS -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="assets/css/style.css">
+    
+    <!-- Structured Data (Schema.org) -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TransportationService",
+        "name": "Sewa Bus Jogja",
+        "alternateName": "Rental Bus Yogyakarta",
+        "description": "Layanan sewa bus terpercaya di Yogyakarta dengan armada modern, driver profesional, dan harga terjangkau. Melayani sewa bus pariwisata, dinas, dan acara keluarga.",
+        "url": "https://www.sewabusjogja.com",
+        "logo": "https://www.sewabusjogja.com/img/logobus.png",
+        "image": "https://www.sewabusjogja.com/img/bus1.png",
+        "telephone": "+628123456789",
+        "email": "info@sewabusjogja.com",
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Jl. Malioboro No. 123",
+            "addressLocality": "Yogyakarta",
+            "postalCode": "55271",
+            "addressRegion": "DI Yogyakarta",
+            "addressCountry": "ID"
+        },
+        "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": "-7.7956",
+            "longitude": "110.3695"
+        },
+        "areaServed": {
+            "@type": "City",
+            "name": "Yogyakarta"
+        },
+        "serviceType": ["Sewa Bus Pariwisata", "Sewa Bus Dinas", "Sewa Bus Acara", "City Tour", "Paket Wisata"],
+        "priceRange": "Rp 1.500.000 - Rp 3.500.000",
+        "openingHoursSpecification": {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": [
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday"
+            ],
+            "opens": "08:00",
+            "closes": "17:00"
+        },
+        "sameAs": [
+            "https://www.facebook.com/sewabusjogja",
+            "https://www.instagram.com/sewabusjogja",
+            "https://www.youtube.com/sewabusjogja"
+        ],
+        "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "5",
+            "reviewCount": "500"
+        }
+    }
+    </script>
+    
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Sewa Bus Jogja",
+        "url": "https://www.sewabusjogja.com",
+        "logo": "https://www.sewabusjogja.com/img/logobus.png",
+        "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "+628123456789",
+            "contactType": "customer service",
+            "areaServed": "ID",
+            "availableLanguage": "Indonesian"
+        }
+    }
+    </script>
 </head>
 <body>
     <!-- Navbar -->
@@ -59,8 +166,8 @@
             <div class="row align-items-center min-vh-100">
                 <div class="col-lg-7" data-aos="fade-up" data-aos-duration="1000">
                     <span class="hero-badge">Layanan Terpercaya Sejak 2010</span>
-                    <h1 class="hero-title">Sewa Bus Premium untuk Perjalanan Anda</h1>
-                    <p class="hero-subtitle">Nikmati perjalanan yang nyaman, aman, dan tak terlupakan dengan armada bus terbaru dan driver profesional. Melayani wisata, dinas, dan acara keluarga di Yogyakarta dan sekitarnya.</p>
+                    <h1 class="hero-title">Sewa Bus Jogja Premium untuk Perjalanan Anda</h1>
+                    <p class="hero-subtitle">Nikmati perjalanan yang nyaman, aman, dan tak terlupakan dengan armada bus terbaru dan driver profesional. Melayani sewa bus pariwisata, wisata, dinas, dan acara keluarga di Yogyakarta dan sekitarnya. Rental bus murah dengan kualitas premium.</p>
                     <div class="hero-features">
                         <div class="feature-item">
                             <i class="fas fa-check-circle"></i>
@@ -86,7 +193,7 @@
                 </div>
                 <div class="col-lg-5" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
                     <div class="hero-image-wrapper">
-                        <img src="img/bus1.png" alt="Bus Premium" class="img-fluid hero-image">
+                        <img src="img/bus1.png" alt="Sewa Bus Jogja - Armada Bus Premium untuk Rental Bus Yogyakarta" class="img-fluid hero-image" loading="eager" width="600" height="400">
                     </div>
                 </div>
             </div>
@@ -104,8 +211,8 @@
             <div class="row align-items-center">
                 <div class="col-lg-6 mb-5 mb-lg-0" data-aos="fade-right">
                     <span class="section-label">Tentang Kami</span>
-                    <h2 class="section-title">Partner Terpercaya untuk Perjalanan Anda</h2>
-                    <p class="section-description">Kami adalah penyedia layanan sewa bus terpercaya di Yogyakarta dengan pengalaman lebih dari 10 tahun. Komitmen kami adalah memberikan layanan terbaik dengan armada bus modern, driver profesional, dan harga yang kompetitif.</p>
+                    <h2 class="section-title">Partner Terpercaya untuk Sewa Bus Jogja Anda</h2>
+                    <p class="section-description">Kami adalah penyedia layanan sewa bus terpercaya di Yogyakarta dengan pengalaman lebih dari 10 tahun. Sebagai rental bus Jogja yang profesional, komitmen kami adalah memberikan layanan terbaik dengan armada bus modern, driver profesional, dan harga sewa bus yang kompetitif. Melayani sewa bus pariwisata, sewa bus wisata, sewa bus dinas, dan sewa bus untuk acara keluarga di seluruh Yogyakarta.</p>
                     <div class="about-stats mt-4">
                         <div class="stat-item">
                             <h3>500+</h3>
@@ -170,8 +277,8 @@
         <div class="container">
             <div class="text-center mb-5" data-aos="fade-up">
                 <span class="section-label">Armada Kami</span>
-                <h2 class="section-title">Pilihan Bus untuk Setiap Kebutuhan</h2>
-                <p class="section-description mx-auto">Kami menyediakan berbagai jenis bus dengan kondisi prima dan fasilitas lengkap untuk memenuhi kebutuhan transportasi Anda.</p>
+                <h2 class="section-title">Pilihan Sewa Bus Jogja untuk Setiap Kebutuhan</h2>
+                <p class="section-description mx-auto">Kami menyediakan berbagai jenis bus dengan kondisi prima dan fasilitas lengkap untuk memenuhi kebutuhan transportasi Anda. Tersedia Big Bus 59 kursi, Medium Bus 35 kursi, dan Mini Bus 25 kursi. Semua armada rental bus Jogja kami terawat dengan baik dan siap melayani perjalanan Anda.</p>
             </div>
             <div class="row g-4">
                 <?php
@@ -180,19 +287,25 @@
                         'name' => 'Big Bus',
                         'capacity' => '59 Kursi',
                         'features' => ['AC Dingin', 'Reclining Seat', 'LCD TV', 'Toilet', 'Bagasi Luas'],
-                        'image' => 'img/bus1.png'
+                        'image' => 'img/bus1.png',
+                        'alt' => 'Sewa Big Bus Jogja 59 Kursi - Rental Bus Besar Yogyakarta',
+                        'title' => 'Sewa Big Bus Jogja 59 Kursi untuk Wisata dan Dinas'
                     ],
                     [
                         'name' => 'Medium Bus',
                         'capacity' => '35 Kursi',
                         'features' => ['AC Dingin', 'Reclining Seat', 'LCD TV', 'Bagasi'],
-                        'image' => 'img/bus1.png'
+                        'image' => 'img/bus1.png',
+                        'alt' => 'Sewa Medium Bus Jogja 35 Kursi - Rental Bus Sedang Yogyakarta',
+                        'title' => 'Sewa Medium Bus Jogja 35 Kursi untuk Perjalanan Menengah'
                     ],
                     [
                         'name' => 'Mini Bus',
                         'capacity' => '25 Kursi',
                         'features' => ['AC Dingin', 'Reclining Seat', 'LCD TV', 'Compact'],
-                        'image' => 'img/bus1.png'
+                        'image' => 'img/bus1.png',
+                        'alt' => 'Sewa Mini Bus Jogja 25 Kursi - Rental Bus Kecil Yogyakarta',
+                        'title' => 'Sewa Mini Bus Jogja 25 Kursi untuk Grup Kecil'
                     ]
                 ];
 
@@ -200,17 +313,17 @@
                     echo '<div class="col-md-4" data-aos="fade-up" data-aos-delay="' . ($index * 100) . '">
                         <div class="armada-card">
                             <div class="armada-image">
-                                <img src="' . $bus['image'] . '" alt="' . $bus['name'] . '" class="img-fluid">
+                                <img src="' . $bus['image'] . '" alt="' . $bus['alt'] . '" title="' . $bus['title'] . '" class="img-fluid" loading="lazy" width="400" height="250">
                                 <div class="armada-badge">' . $bus['capacity'] . '</div>
                             </div>
                             <div class="armada-body">
-                                <h4 class="armada-name">' . $bus['name'] . '</h4>
+                                <h4 class="armada-name">' . $bus['name'] . ' - ' . $bus['capacity'] . '</h4>
                                 <ul class="armada-features">';
                     foreach ($bus['features'] as $feature) {
                         echo '<li><i class="fas fa-check"></i> ' . $feature . '</li>';
                     }
                     echo '</ul>
-                                <a href="#contact" class="btn btn-outline-primary w-100 mt-3">Pesan Sekarang</a>
+                                <a href="#contact" class="btn btn-outline-primary w-100 mt-3" aria-label="Pesan ' . $bus['name'] . ' sekarang">Pesan Sekarang</a>
                             </div>
                         </div>
                     </div>';
@@ -225,14 +338,14 @@
         <div class="container">
             <div class="text-center mb-5" data-aos="fade-up">
                 <span class="section-label">Paket Sewa</span>
-                <h2 class="section-title">Pilihan Paket untuk Perjalanan Anda</h2>
-                <p class="section-description mx-auto">Pilih paket yang sesuai dengan kebutuhan perjalanan Anda. Semua paket sudah termasuk driver profesional dan BBM.</p>
+                <h2 class="section-title">Pilihan Paket Sewa Bus Jogja untuk Perjalanan Anda</h2>
+                <p class="section-description mx-auto">Pilih paket sewa bus yang sesuai dengan kebutuhan perjalanan Anda. Semua paket rental bus Jogja sudah termasuk driver profesional dan BBM. Tersedia paket city tour, paket wisata, dan paket drop off dengan harga terjangkau.</p>
             </div>
             <div class="row g-4">
                 <div class="col-md-4" data-aos="fade-up" data-aos-delay="0">
                     <div class="package-card">
                         <div class="package-header">
-                            <h3>Paket City Tour</h3>
+                            <h3>Paket City Tour Jogja</h3>
                             <div class="package-price">
                                 <span class="price-currency">Rp</span>
                                 <span class="price-amount">2.000.000</span>
@@ -247,7 +360,7 @@
                                 <li><i class="fas fa-check"></i> Air mineral</li>
                                 <li><i class="fas fa-check"></i> Parkir & tol</li>
                             </ul>
-                            <a href="#contact" class="btn btn-outline-primary w-100 mt-4">Pilih Paket</a>
+                            <a href="#contact" class="btn btn-outline-primary w-100 mt-4" aria-label="Pesan Paket City Tour Jogja">Pilih Paket</a>
                         </div>
                     </div>
                 </div>
@@ -255,7 +368,7 @@
                     <div class="package-card package-featured">
                         <div class="package-badge">Paling Populer</div>
                         <div class="package-header">
-                            <h3>Paket Wisata</h3>
+                            <h3>Paket Wisata Jogja</h3>
                             <div class="package-price">
                                 <span class="price-currency">Rp</span>
                                 <span class="price-amount">3.500.000</span>
@@ -271,7 +384,7 @@
                                 <li><i class="fas fa-check"></i> Snack box</li>
                                 <li><i class="fas fa-check"></i> Parkir & tol</li>
                             </ul>
-                            <a href="#contact" class="btn btn-primary w-100 mt-4">Pilih Paket</a>
+                            <a href="#contact" class="btn btn-primary w-100 mt-4" aria-label="Pesan Paket Wisata Jogja">Pilih Paket</a>
                         </div>
                     </div>
                 </div>
@@ -293,7 +406,7 @@
                                 <li><i class="fas fa-check"></i> Air mineral</li>
                                 <li><i class="fas fa-check"></i> Parkir & tol</li>
                             </ul>
-                            <a href="#contact" class="btn btn-outline-primary w-100 mt-4">Pilih Paket</a>
+                            <a href="#contact" class="btn btn-outline-primary w-100 mt-4" aria-label="Pesan Paket Drop Off">Pilih Paket</a>
                         </div>
                     </div>
                 </div>
@@ -306,8 +419,8 @@
         <div class="container">
             <div class="text-center mb-5" data-aos="fade-up">
                 <span class="section-label">Hubungi Kami</span>
-                <h2 class="section-title">Siap Melayani Kebutuhan Anda</h2>
-                <p class="section-description mx-auto">Hubungi kami untuk informasi lebih lanjut atau booking langsung. Tim kami siap membantu Anda 24/7.</p>
+                <h2 class="section-title">Siap Melayani Kebutuhan Sewa Bus Jogja Anda</h2>
+                <p class="section-description mx-auto">Hubungi kami untuk informasi lebih lanjut tentang sewa bus Jogja atau booking langsung. Tim rental bus Yogyakarta kami siap membantu Anda 24/7. Dapatkan penawaran harga sewa bus murah Jogja sekarang juga!</p>
             </div>
             <div class="row g-4">
                 <div class="col-lg-6" data-aos="fade-right">
@@ -407,7 +520,7 @@
                 <div class="col-lg-4 col-md-6">
                     <div class="footer-widget">
                         <h5 class="footer-title">Sewa Bus Jogja</h5>
-                        <p class="footer-description">Partner terpercaya untuk perjalanan Anda di Yogyakarta dan sekitarnya. Layanan sewa bus premium dengan armada modern dan driver profesional.</p>
+                        <p class="footer-description">Partner terpercaya untuk sewa bus dan rental bus di Yogyakarta dan sekitarnya. Layanan sewa bus premium dengan armada modern dan driver profesional. Melayani sewa bus pariwisata, sewa bus wisata, sewa bus dinas, dan sewa bus untuk acara keluarga.</p>
                     </div>
                 </div>
                 <div class="col-lg-2 col-md-6">
@@ -496,6 +609,4 @@
         });
     </script>
 </body>
-</html>
-
 </html>
