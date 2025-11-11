@@ -98,9 +98,9 @@ function getCurrentAdmin() {
     }
     
     return [
-        'id' => $_SESSION['admin_id'],
-        'username' => $_SESSION['admin_username'],
-        'email' => $_SESSION['admin_email'],
+        'id' => $_SESSION['admin_id'] ?? null,
+        'username' => $_SESSION['admin_username'] ?? '',
+        'email' => $_SESSION['admin_email'] ?? '',
         'full_name' => $_SESSION['admin_full_name'] ?? '',
         'role' => $_SESSION['admin_role'] ?? 'admin'
     ];

@@ -54,76 +54,50 @@ try {
 include __DIR__ . '/includes/header.php';
 ?>
 
-<div class="row mb-4">
-    <div class="col-12">
-        <h2 class="mb-0">Dashboard</h2>
-        <p class="text-muted">Selamat datang, <?php echo htmlspecialchars(getCurrentAdmin()['full_name'] ?: getCurrentAdmin()['username']); ?>!</p>
-    </div>
+<div class="page-header">
+    <h2>Dashboard</h2>
+    <p>Selamat datang, <?php echo htmlspecialchars(getCurrentAdmin()['full_name'] ?: getCurrentAdmin()['username']); ?>! 👋</p>
 </div>
 
 <!-- Statistics Cards -->
 <div class="row g-4 mb-4">
     <div class="col-md-3">
-        <div class="card stat-card shadow-sm">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-muted mb-2">Total Pesan</h6>
-                        <h3 class="mb-0"><?php echo number_format($stats['total_messages']); ?></h3>
-                    </div>
-                    <div class="text-primary">
-                        <i class="fas fa-envelope fa-2x"></i>
-                    </div>
-                </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff;">
+                <i class="fas fa-envelope"></i>
             </div>
+            <h3 class="stat-value"><?php echo number_format($stats['total_messages']); ?></h3>
+            <p class="stat-label">Total Pesan</p>
         </div>
     </div>
     
     <div class="col-md-3">
-        <div class="card stat-card shadow-sm">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-muted mb-2">Pesan Baru</h6>
-                        <h3 class="mb-0 text-danger"><?php echo number_format($stats['new_messages']); ?></h3>
-                    </div>
-                    <div class="text-danger">
-                        <i class="fas fa-envelope-open fa-2x"></i>
-                    </div>
-                </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: #fff;">
+                <i class="fas fa-envelope-open"></i>
             </div>
+            <h3 class="stat-value" style="color: #f5576c;"><?php echo number_format($stats['new_messages']); ?></h3>
+            <p class="stat-label">Pesan Baru</p>
         </div>
     </div>
     
     <div class="col-md-3">
-        <div class="card stat-card shadow-sm">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-muted mb-2">Total Artikel</h6>
-                        <h3 class="mb-0"><?php echo number_format($stats['total_articles']); ?></h3>
-                    </div>
-                    <div class="text-success">
-                        <i class="fas fa-newspaper fa-2x"></i>
-                    </div>
-                </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: #fff;">
+                <i class="fas fa-newspaper"></i>
             </div>
+            <h3 class="stat-value" style="color: #4facfe;"><?php echo number_format($stats['total_articles']); ?></h3>
+            <p class="stat-label">Total Artikel</p>
         </div>
     </div>
     
     <div class="col-md-3">
-        <div class="card stat-card shadow-sm">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-muted mb-2">Total Media</h6>
-                        <h3 class="mb-0"><?php echo number_format($stats['total_media']); ?></h3>
-                    </div>
-                    <div class="text-info">
-                        <i class="fas fa-images fa-2x"></i>
-                    </div>
-                </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: #fff;">
+                <i class="fas fa-images"></i>
             </div>
+            <h3 class="stat-value" style="color: #43e97b;"><?php echo number_format($stats['total_media']); ?></h3>
+            <p class="stat-label">Total Media</p>
         </div>
     </div>
 </div>
