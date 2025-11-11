@@ -29,8 +29,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     
     try {
-        // Prepare SQL statement
-        $stmt = $conn->prepare("INSERT INTO messages (name, email, phone, message) VALUES (?, ?, ?, ?)");
+        // Check if table exists first
+        $tableCheck = $conn->query("SHOW TABLES LIKE 'messages'");
+        if ($tableCheck->rowCount() == 0) {
+            error_log("Table 'messages' does not exist in database");
+            header("Location: index.php?status=error#contact");
+            exit();
+        }
+        
+        // Prepare SQL statement - explicitly include status column with default
+        $stmt = $conn->prepare("INSERT INTO messages (name, email, phone, message, status) VALUES (?, ?, ?, ?, 'new')");
         
         // Execute with parameters
         $result = $stmt->execute([$name, $email, $phone, $message]);
@@ -47,7 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit();
         } else {
             // No rows inserted
-            error_log("Failed to insert message: rowCount=" . $stmt->rowCount() . ", lastInsertId=" . $insertId);
+            error_log("Failed to insert message: result=" . ($result ? 'true' : 'false') . ", rowCount=" . $stmt->rowCount() . ", lastInsertId=" . $insertId);
             header("Location: index.php?status=error#contact");
             exit();
         }
@@ -55,6 +63,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Log error (jangan tampilkan error ke user di production)
         error_log("Error inserting message: " . $e->getMessage());
         error_log("SQL Error Code: " . $e->getCode());
+        error_log("SQL State: " . $e->getCode());
+        error_log("SQL Query: INSERT INTO messages (name, email, phone, message, status) VALUES (?, ?, ?, ?, 'new')");
         
         // Redirect with error message
         header("Location: index.php?status=error#contact");
