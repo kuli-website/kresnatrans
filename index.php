@@ -442,6 +442,39 @@
                 <div class="col-lg-6" data-aos="fade-right">
                     <div class="contact-card">
                         <h4 class="contact-card-title">Kirim Pesan</h4>
+                        
+                        <?php
+                        // Display status messages
+                        if (isset($_GET['status'])) {
+                            $status = $_GET['status'];
+                            if ($status == 'success') {
+                                echo '<div class="alert alert-success alert-dismissible fade show" role="alert">
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    <strong>Berhasil!</strong> Pesan Anda telah dikirim. Kami akan segera menghubungi Anda.
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>';
+                            } elseif ($status == 'error') {
+                                echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    <i class="fas fa-exclamation-circle me-2"></i>
+                                    <strong>Error!</strong> Terjadi kesalahan saat mengirim pesan. Silakan coba lagi atau hubungi kami langsung.
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>';
+                            } elseif ($status == 'invalid') {
+                                echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <strong>Peringatan!</strong> Mohon lengkapi semua field yang diperlukan.
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>';
+                            } elseif ($status == 'invalid_email') {
+                                echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <strong>Peringatan!</strong> Format email tidak valid. Mohon periksa kembali alamat email Anda.
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>';
+                            }
+                        }
+                        ?>
+                        
                         <form action="process.php" method="POST" class="contact-form">
                             <div class="mb-3">
                                 <label for="name" class="form-label">Nama Lengkap</label>
