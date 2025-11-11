@@ -14,6 +14,11 @@ try {
     // echo "Connection failed: " . $e->getMessage();
 }
 
+// Include media helper functions
+if (file_exists(__DIR__ . '/includes/media_helper.php')) {
+    require_once __DIR__ . '/includes/media_helper.php';
+}
+
 // Site configuration
 $site_name = 'Bus Jogja';
 $site_email = 'info@busjogja.com';

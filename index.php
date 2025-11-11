@@ -21,7 +21,13 @@
     <meta property="og:url" content="https://www.sewabusjogja.com/">
     <meta property="og:title" content="Sewa Bus Jogja - Rental Bus Yogyakarta | Armada Premium & Profesional">
     <meta property="og:description" content="Sewa Bus Jogja terpercaya sejak 2010. Layanan rental bus Yogyakarta dengan armada modern, driver profesional, harga terjangkau. Melayani wisata, dinas, acara keluarga.">
-    <meta property="og:image" content="https://www.sewabusjogja.com/img/bus1.png">
+    <?php
+    // Get images from database
+    $og_image = getMediaUrl('og_image', 'img/bus1.png');
+    $favicon = getMediaUrl('favicon', 'img/logobus.png');
+    $site_url = 'https://www.sewabusjogja.com';
+    ?>
+    <meta property="og:image" content="<?php echo htmlspecialchars($site_url . '/' . $og_image); ?>">
     <meta property="og:locale" content="id_ID">
     <meta property="og:site_name" content="Sewa Bus Jogja">
     
@@ -30,13 +36,13 @@
     <meta property="twitter:url" content="https://www.sewabusjogja.com/">
     <meta property="twitter:title" content="Sewa Bus Jogja - Rental Bus Yogyakarta | Armada Premium & Profesional">
     <meta property="twitter:description" content="Sewa Bus Jogja terpercaya sejak 2010. Layanan rental bus Yogyakarta dengan armada modern, driver profesional, harga terjangkau.">
-    <meta property="twitter:image" content="https://www.sewabusjogja.com/img/bus1.png">
+    <meta property="twitter:image" content="<?php echo htmlspecialchars($site_url . '/' . $og_image); ?>">
     
     <!-- Canonical URL -->
     <link rel="canonical" href="https://www.sewabusjogja.com/">
     
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="img/logobus.png">
+    <link rel="icon" type="image/png" href="<?php echo htmlspecialchars($favicon); ?>">
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -61,8 +67,8 @@
         "alternateName": "Rental Bus Yogyakarta",
         "description": "Layanan sewa bus terpercaya di Yogyakarta dengan armada modern, driver profesional, dan harga terjangkau. Melayani sewa bus pariwisata, dinas, dan acara keluarga.",
         "url": "https://www.sewabusjogja.com",
-        "logo": "https://www.sewabusjogja.com/img/logobus.png",
-        "image": "https://www.sewabusjogja.com/img/bus1.png",
+        "logo": "https://www.sewabusjogja.com/<?php echo htmlspecialchars(getMediaUrl('logo_navbar', 'img/logobus.png')); ?>",
+        "image": "https://www.sewabusjogja.com/<?php echo htmlspecialchars(getMediaUrl('hero_image', 'img/bus1.png')); ?>",
         "telephone": "+628123456789",
         "email": "info@sewabusjogja.com",
         "address": {
@@ -115,7 +121,7 @@
         "@type": "Organization",
         "name": "Sewa Bus Jogja",
         "url": "https://www.sewabusjogja.com",
-        "logo": "https://www.sewabusjogja.com/img/logobus.png",
+        "logo": "https://www.sewabusjogja.com/<?php echo htmlspecialchars(getMediaUrl('logo_navbar', 'img/logobus.png')); ?>",
         "contactPoint": {
             "@type": "ContactPoint",
             "telephone": "+628123456789",
@@ -132,7 +138,7 @@
     <nav class="navbar navbar-expand-lg fixed-top" id="mainNavbar">
         <div class="container">
             <a class="navbar-brand" href="#home">
-                <img src="img/logobus.png" alt="Sewa Bus Jogja - Rental Bus Yogyakarta" class="navbar-logo">
+                <?php echo getMediaImage('logo_navbar', 'img/logobus.png', 'Sewa Bus Jogja - Rental Bus Yogyakarta', 'navbar-logo'); ?>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -196,7 +202,7 @@
                 </div>
                 <div class="col-lg-5" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
                     <div class="hero-image-wrapper">
-                        <img src="img/bus1.png" alt="Sewa Bus Jogja - Armada Bus Premium untuk Rental Bus Yogyakarta" class="img-fluid hero-image" loading="eager" width="600" height="400">
+                        <?php echo getMediaImage('hero_image', 'img/bus1.png', 'Sewa Bus Jogja - Armada Bus Premium untuk Rental Bus Yogyakarta', 'img-fluid hero-image', ['loading' => 'eager', 'width' => '600', 'height' => '400']); ?>
                     </div>
                 </div>
             </div>
@@ -290,43 +296,50 @@
                         'name' => 'Big Bus',
                         'capacity' => '59 Kursi',
                         'features' => ['AC Dingin', 'Reclining Seat', 'LCD TV', 'Toilet', 'Bagasi Luas'],
-                        'image' => 'img/bus1.png',
-                        'alt' => 'Sewa Big Bus Jogja 59 Kursi - Rental Bus Besar Yogyakarta',
-                        'title' => 'Sewa Big Bus Jogja 59 Kursi untuk Wisata dan Dinas'
+                        'media_key' => 'armada_big_bus',
+                        'default_image' => 'img/bus1.png',
+                        'default_alt' => 'Sewa Big Bus Jogja 59 Kursi - Rental Bus Besar Yogyakarta',
+                        'default_title' => 'Sewa Big Bus Jogja 59 Kursi untuk Wisata dan Dinas'
                     ],
                     [
                         'name' => 'Medium Bus',
                         'capacity' => '35 Kursi',
                         'features' => ['AC Dingin', 'Reclining Seat', 'LCD TV', 'Bagasi'],
-                        'image' => 'img/bus1.png',
-                        'alt' => 'Sewa Medium Bus Jogja 35 Kursi - Rental Bus Sedang Yogyakarta',
-                        'title' => 'Sewa Medium Bus Jogja 35 Kursi untuk Perjalanan Menengah'
+                        'media_key' => 'armada_medium_bus',
+                        'default_image' => 'img/bus1.png',
+                        'default_alt' => 'Sewa Medium Bus Jogja 35 Kursi - Rental Bus Sedang Yogyakarta',
+                        'default_title' => 'Sewa Medium Bus Jogja 35 Kursi untuk Perjalanan Menengah'
                     ],
                     [
                         'name' => 'Mini Bus',
                         'capacity' => '25 Kursi',
                         'features' => ['AC Dingin', 'Reclining Seat', 'LCD TV', 'Compact'],
-                        'image' => 'img/bus1.png',
-                        'alt' => 'Sewa Mini Bus Jogja 25 Kursi - Rental Bus Kecil Yogyakarta',
-                        'title' => 'Sewa Mini Bus Jogja 25 Kursi untuk Grup Kecil'
+                        'media_key' => 'armada_mini_bus',
+                        'default_image' => 'img/bus1.png',
+                        'default_alt' => 'Sewa Mini Bus Jogja 25 Kursi - Rental Bus Kecil Yogyakarta',
+                        'default_title' => 'Sewa Mini Bus Jogja 25 Kursi untuk Grup Kecil'
                     ]
                 ];
 
                 foreach ($armada as $index => $bus) {
+                    $image_url = getMediaUrl($bus['media_key'], $bus['default_image']);
+                    $image_alt = getMediaAlt($bus['media_key'], $bus['default_alt']);
+                    $image_title = getMediaTitle($bus['media_key'], $bus['default_title']);
+                    
                     echo '<div class="col-md-4" data-aos="fade-up" data-aos-delay="' . ($index * 100) . '">
                         <div class="armada-card">
                             <div class="armada-image">
-                                <img src="' . $bus['image'] . '" alt="' . $bus['alt'] . '" title="' . $bus['title'] . '" class="img-fluid" loading="lazy" width="400" height="250">
-                                <div class="armada-badge">' . $bus['capacity'] . '</div>
+                                <img src="' . htmlspecialchars($image_url, ENT_QUOTES, 'UTF-8') . '" alt="' . htmlspecialchars($image_alt, ENT_QUOTES, 'UTF-8') . '" title="' . htmlspecialchars($image_title, ENT_QUOTES, 'UTF-8') . '" class="img-fluid" loading="lazy" width="400" height="250">
+                                <div class="armada-badge">' . htmlspecialchars($bus['capacity'], ENT_QUOTES, 'UTF-8') . '</div>
                             </div>
                             <div class="armada-body">
-                                <h4 class="armada-name">' . $bus['name'] . ' - ' . $bus['capacity'] . '</h4>
+                                <h4 class="armada-name">' . htmlspecialchars($bus['name'], ENT_QUOTES, 'UTF-8') . ' - ' . htmlspecialchars($bus['capacity'], ENT_QUOTES, 'UTF-8') . '</h4>
                                 <ul class="armada-features">';
                     foreach ($bus['features'] as $feature) {
-                        echo '<li><i class="fas fa-check"></i> ' . $feature . '</li>';
+                        echo '<li><i class="fas fa-check"></i> ' . htmlspecialchars($feature, ENT_QUOTES, 'UTF-8') . '</li>';
                     }
                     echo '</ul>
-                                <a href="#contact" class="btn btn-outline-primary w-100 mt-3" aria-label="Pesan ' . $bus['name'] . ' sekarang">Pesan Sekarang</a>
+                                <a href="#contact" class="btn btn-outline-primary w-100 mt-3" aria-label="Pesan ' . htmlspecialchars($bus['name'], ENT_QUOTES, 'UTF-8') . ' sekarang">Pesan Sekarang</a>
                             </div>
                         </div>
                     </div>';
