@@ -5,7 +5,7 @@ require_once __DIR__ . '/config.php';
 // Check if database connection exists
 if (!isset($conn) || $conn === null) {
     error_log("Database connection not established in process.php");
-    header("Location: index.php#contact?status=error");
+    header("Location: index.php?status=error#contact");
     exit();
 }
 
@@ -18,13 +18,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     // Validate input
     if (empty($name) || empty($email) || empty($phone) || empty($message)) {
-        header("Location: index.php#contact?status=invalid");
+        header("Location: index.php?status=invalid#contact");
         exit();
     }
     
     // Validate email format
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        header("Location: index.php#contact?status=invalid_email");
+        header("Location: index.php?status=invalid_email#contact");
         exit();
     }
     
@@ -33,24 +33,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt = $conn->prepare("INSERT INTO messages (name, email, phone, message) VALUES (?, ?, ?, ?)");
         
         // Execute with parameters
-        $stmt->execute([$name, $email, $phone, $message]);
+        $result = $stmt->execute([$name, $email, $phone, $message]);
         
         // Check if insert was successful
-        if ($stmt->rowCount() > 0) {
+        // Use lastInsertId() as it's more reliable for INSERT operations
+        $insertId = $conn->lastInsertId();
+        if ($result && $insertId > 0) {
+            // Log success for debugging (optional)
+            error_log("Message inserted successfully with ID: " . $insertId);
+            
             // Redirect back with success message
-            header("Location: index.php#contact?status=success");
+            header("Location: index.php?status=success#contact");
             exit();
         } else {
             // No rows inserted
-            header("Location: index.php#contact?status=error");
+            error_log("Failed to insert message: rowCount=" . $stmt->rowCount() . ", lastInsertId=" . $insertId);
+            header("Location: index.php?status=error#contact");
             exit();
         }
     } catch(PDOException $e) {
         // Log error (jangan tampilkan error ke user di production)
         error_log("Error inserting message: " . $e->getMessage());
+        error_log("SQL Error Code: " . $e->getCode());
         
         // Redirect with error message
-        header("Location: index.php#contact?status=error");
+        header("Location: index.php?status=error#contact");
         exit();
     }
 } else {

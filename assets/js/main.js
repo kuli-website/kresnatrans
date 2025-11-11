@@ -27,7 +27,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 });
 
 // Form submission handler
-const contactForm = document.querySelector('form');
+const contactForm = document.querySelector('form.contact-form');
 if (contactForm) {
     contactForm.addEventListener('submit', function(e) {
         // You can add form validation here if needed
@@ -40,6 +40,25 @@ if (contactForm) {
         if (!name || !email || !phone || !message) {
             e.preventDefault();
             alert('Mohon lengkapi semua field yang diperlukan');
+            return false;
         }
+        // Let the form submit normally if validation passes
     });
 }
+
+// Scroll to contact section if status parameter exists
+window.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('status')) {
+        // Wait a bit for page to fully load
+        setTimeout(function() {
+            const contactSection = document.querySelector('#contact');
+            if (contactSection) {
+                window.scrollTo({
+                    top: contactSection.offsetTop - 75,
+                    behavior: 'smooth'
+                });
+            }
+        }, 100);
+    }
+});
