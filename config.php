@@ -1,9 +1,9 @@
 <?php
 // Database configuration
 $db_host = 'localhost';
-$db_user = 'sewabusjo_nIqUPo';
+$db_user = 'sewabusjogja';
 $db_pass = 'Wiyachan123.';
-$db_name = 'sewabusjo_nIqUPo';
+$db_name = 'sewabusjogja';
 
 // Create database connection
 $conn = null;
