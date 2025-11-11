@@ -1,30 +1,31 @@
 <?php
 session_start();
-include '../config.php';
+require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/includes/auth_helper.php';
 
 $error = '';
 
-// Simple login (ganti dengan sistem auth yang lebih aman)
+// Handle login
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $username = $_POST['username'] ?? '';
+    $username = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
     
-    // Default credentials (GANTI INI!)
-    // Buat user di database dan gunakan password_hash untuk password
-    if ($username === 'admin' && $password === 'admin123') {
-        $_SESSION['admin_logged_in'] = true;
-        $_SESSION['admin_id'] = 1;
-        $_SESSION['admin_username'] = $username;
-        header('Location: media_manager.php');
-        exit;
+    if (empty($username) || empty($password)) {
+        $error = 'Username dan password harus diisi!';
     } else {
-        $error = 'Username atau password salah!';
+        $result = loginUser($username, $password);
+        if ($result['success']) {
+            header('Location: index.php');
+            exit;
+        } else {
+            $error = $result['message'] ?? 'Username atau password salah!';
+        }
     }
 }
 
 // Check if already logged in
-if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) {
-    header('Location: media_manager.php');
+if (isAdminLoggedIn()) {
+    header('Location: index.php');
     exit;
 }
 ?>
@@ -91,7 +92,7 @@ if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true
                 <div class="mt-3 text-center">
                     <small class="text-muted">
                         <i class="fas fa-info-circle me-1"></i>
-                        Default: admin / admin123 (GANTI INI!)
+                        Akses terbatas untuk administrator
                     </small>
                 </div>
             </div>
