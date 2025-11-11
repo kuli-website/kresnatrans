@@ -90,7 +90,32 @@ header('Content-Type: text/html; charset=utf-8');
         // Check database connection
         if (!isset($conn) || $conn === null) {
             echo '<div class="error">❌ <strong>Error:</strong> Koneksi database tidak berhasil!</div>';
-            echo '<div class="info">Pastikan konfigurasi di <code>config.php</code> sudah benar.</div>';
+            
+            // Display error message if available
+            if (isset($db_error) && !empty($db_error)) {
+                echo '<div class="error"><strong>Detail Error:</strong><br>';
+                echo '<code>' . htmlspecialchars($db_error) . '</code></div>';
+            }
+            
+            echo '<div class="info"><strong>Konfigurasi saat ini:</strong><br>';
+            echo 'Host: <code>' . htmlspecialchars($db_host ?? 'tidak terdefinisi') . '</code><br>';
+            echo 'Database: <code>' . htmlspecialchars($db_name ?? 'tidak terdefinisi') . '</code><br>';
+            echo 'User: <code>' . htmlspecialchars($db_user ?? 'tidak terdefinisi') . '</code><br>';
+            echo 'Password: <code>' . (isset($db_pass) ? '***' : 'tidak terdefinisi') . '</code></div>';
+            
+            echo '<div class="warning"><strong>Kemungkinan penyebab:</strong><br>';
+            echo '1. Kredensial database salah<br>';
+            echo '2. Database belum dibuat<br>';
+            echo '3. Server MySQL/MariaDB tidak berjalan<br>';
+            echo '4. Host database salah (bukan localhost)<br>';
+            echo '5. Firewall memblokir koneksi</div>';
+            
+            echo '<div class="info"><strong>Langkah troubleshooting:</strong><br>';
+            echo '1. Pastikan MySQL/MariaDB server berjalan<br>';
+            echo '2. Cek apakah database <code>' . htmlspecialchars($db_name ?? '') . '</code> sudah dibuat<br>';
+            echo '3. Coba login ke database dengan kredensial yang sama menggunakan phpMyAdmin atau MySQL client<br>';
+            echo '4. Jika menggunakan hosting, pastikan host bukan "localhost" tapi IP atau hostname yang diberikan hosting</div>';
+            
             exit;
         }
         

@@ -6,12 +6,17 @@ $db_pass = 'Wiyachan123.';
 $db_name = 'sewabusjo_nIqUPo';
 
 // Create database connection
+$conn = null;
+$db_error = null;
 try {
-    $conn = new PDO("mysql:host=$db_host;dbname=$db_name", $db_user, $db_pass);
+    $conn = new PDO("mysql:host=$db_host;dbname=$db_name;charset=utf8mb4", $db_user, $db_pass);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 } catch(PDOException $e) {
-    // For development only. In production, log errors instead of displaying them
-    // echo "Connection failed: " . $e->getMessage();
+    // Store error for debugging
+    $db_error = $e->getMessage();
+    error_log("Database connection failed: " . $db_error);
+    // Don't set $conn, let it remain null so we can check it
 }
 
 // Include media helper functions
