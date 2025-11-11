@@ -1,27 +1,17 @@
 <?php
 // Database configuration
 $db_host = 'localhost';
-$db_user = 'root';
-$db_pass = '';
-$db_name = 'sewabus';
-
-// Initialize connection variable
-$conn = null;
+$db_user = 'sewabusjo_nIqUPo';
+$db_pass = 'Wiyachan123.';
+$db_name = 'sewabusjo_nIqUPo';
 
 // Create database connection
 try {
-    $dsn = "mysql:host=$db_host;dbname=$db_name;charset=utf8mb4";
-    $options = [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::ATTR_EMULATE_PREPARES => false,
-    ];
-    $conn = new PDO($dsn, $db_user, $db_pass, $options);
+    $conn = new PDO("mysql:host=$db_host;dbname=$db_name", $db_user, $db_pass);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch(PDOException $e) {
-    // Log error in production
-    error_log("Database connection failed: " . $e->getMessage());
-    // Set $conn to null so we can check it later
-    $conn = null;
+    // For development only. In production, log errors instead of displaying them
+    // echo "Connection failed: " . $e->getMessage();
 }
 
 // Include media helper functions
