@@ -5,6 +5,16 @@
  */
 
 /**
+ * Mendapatkan media berdasarkan media_key (alias untuk getMedia)
+ * 
+ * @param string $media_key Key unik media
+ * @return array|null Array dengan informasi media atau null
+ */
+function getMediaByKey($media_key) {
+    return getMedia($media_key);
+}
+
+/**
  * Mendapatkan media berdasarkan media_key
  * 
  * @param string $media_key Key unik media
@@ -268,10 +278,53 @@ function uploadMedia($file, $media_key, $category = 'gallery', $alt_text = '', $
     
     // Validasi tipe file
     $allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-    $finfo = new finfo(FILEINFO_MIME_TYPE);
-    $mime_type = $finfo->file($file['tmp_name']);
+    $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
     
-    if (!in_array($mime_type, $allowed_types)) {
+    // Get MIME type dengan beberapa metode fallback
+    $mime_type = null;
+    
+    // Method 1: Try finfo (jika tersedia)
+    if (class_exists('finfo')) {
+        try {
+            $finfo = new finfo(FILEINFO_MIME_TYPE);
+            $mime_type = $finfo->file($file['tmp_name']);
+        } catch (Exception $e) {
+            // Fallback jika error
+        }
+    }
+    
+    // Method 2: Try mime_content_type (jika finfo tidak tersedia)
+    if (empty($mime_type) && function_exists('mime_content_type')) {
+        $mime_type = mime_content_type($file['tmp_name']);
+    }
+    
+    // Method 3: Try getimagesize (untuk gambar)
+    if (empty($mime_type)) {
+        $image_info = @getimagesize($file['tmp_name']);
+        if ($image_info && isset($image_info['mime'])) {
+            $mime_type = $image_info['mime'];
+        }
+    }
+    
+    // Method 4: Fallback ke validasi ekstensi file
+    if (empty($mime_type)) {
+        $file_extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        if (!in_array($file_extension, $allowed_extensions)) {
+            return false;
+        }
+        // Set mime type berdasarkan ekstensi
+        $mime_map = [
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'png' => 'image/png',
+            'gif' => 'image/gif',
+            'webp' => 'image/webp'
+        ];
+        $mime_type = $mime_map[$file_extension] ?? null;
+    }
+    
+    // Final validation
+    if (empty($mime_type) || !in_array($mime_type, $allowed_types)) {
         return false;
     }
     
