@@ -8,7 +8,7 @@ requireLogin();
 
 $page_title = 'Kelola Armada Bus';
 $message = '';
-$message_type = '';
+$message_type = ''; 
 
 // Handle form actions
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
