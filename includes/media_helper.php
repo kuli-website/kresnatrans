@@ -365,12 +365,32 @@ function uploadMedia($file, $media_key, $category = 'gallery', $alt_text = '', $
     // Pilih direktori yang berhasil dibuat
     $final_upload_dir = is_dir($upload_dir) ? $upload_dir : $upload_dir_abs;
     
-    // Pastikan direktori writable
+    // Pastikan direktori writable - coba beberapa permission
     if (!is_writable($final_upload_dir)) {
-        @chmod($final_upload_dir, 0755);
-        // Jika masih tidak bisa write, coba 0777 (untuk shared hosting)
+        // Coba 0777 dulu (untuk shared hosting yang memerlukan permission lebih luas)
+        @chmod($final_upload_dir, 0777);
+        // Jika masih gagal, coba 0755
         if (!is_writable($final_upload_dir)) {
-            @chmod($final_upload_dir, 0777);
+            @chmod($final_upload_dir, 0755);
+        }
+        // Jika masih gagal, coba 0775
+        if (!is_writable($final_upload_dir)) {
+            @chmod($final_upload_dir, 0775);
+        }
+        
+        // Final check
+        if (!is_writable($final_upload_dir)) {
+            error_log("Directory still not writable after chmod attempts: " . $final_upload_dir);
+            error_log("Current permission: " . substr(sprintf('%o', fileperms($final_upload_dir)), -4));
+        }
+    }
+    
+    // Pastikan folder parent juga writable
+    $parent_dir = dirname($final_upload_dir);
+    if (is_dir($parent_dir) && !is_writable($parent_dir)) {
+        @chmod($parent_dir, 0755);
+        if (!is_writable($parent_dir)) {
+            @chmod($parent_dir, 0777);
         }
     }
     

@@ -27,7 +27,8 @@ header('Content-Type: text/html; charset=utf-8');
             <div class="card-body">
                 <?php
                 $upload_dir = 'uploads/media/';
-                $upload_dir_abs = __DIR__ . '/../uploads/media/';
+                // Path absolut dari root website (admin folder ada di satu level di bawah root)
+                $upload_dir_abs = dirname(__DIR__) . '/uploads/media/';
                 
                 echo '<h5>Path Check:</h5>';
                 echo '<ul>';
@@ -121,25 +122,128 @@ header('Content-Type: text/html; charset=utf-8');
                 // Try to write test file
                 if ($test_create || file_exists($upload_dir_abs)) {
                     echo '<h5 class="mt-4">Write Test File:</h5>';
+                    
+                    // Coba fix permission dulu dengan berbagai cara
+                    echo '<p>Mencoba fix permission folder...</p>';
+                    $perms_to_try = [0777, 0775, 0755];
+                    $fixed = false;
+                    foreach ($perms_to_try as $perm) {
+                        @chmod($upload_dir_abs, $perm);
+                        if (is_writable($upload_dir_abs)) {
+                            $fixed = true;
+                            echo '<span class="badge bg-success">Permission berhasil diubah ke ' . substr(sprintf('%o', $perm), -4) . '</span><br>';
+                            break;
+                        }
+                    }
+                    
+                    if (!$fixed) {
+                        echo '<span class="badge bg-warning">Permission tidak bisa diubah dari PHP</span><br>';
+                    }
+                    
+                    $perms_after = fileperms($upload_dir_abs);
+                    echo '<p>Status saat ini:</p>';
+                    echo '<ul>';
+                    echo '<li>Permission: <code>' . substr(sprintf('%o', $perms_after), -4) . '</code></li>';
+                    echo '<li>Writable: <span class="badge bg-' . (is_writable($upload_dir_abs) ? 'success' : 'danger') . '">' . (is_writable($upload_dir_abs) ? 'YES' : 'NO') . '</span></li>';
+                    echo '<li>Readable: <span class="badge bg-' . (is_readable($upload_dir_abs) ? 'success' : 'danger') . '">' . (is_readable($upload_dir_abs) ? 'YES' : 'NO') . '</span></li>';
+                    echo '</ul>';
+                    
+                    // Cek owner folder (jika function tersedia)
+                    if (function_exists('posix_getpwuid') && function_exists('fileowner')) {
+                        $owner = fileowner($upload_dir_abs);
+                        $owner_info = posix_getpwuid($owner);
+                        echo '<p>Owner: <code>' . ($owner_info['name'] ?? 'Unknown') . '</code> (UID: ' . $owner . ')</p>';
+                    }
+                    
                     $test_file = $upload_dir_abs . 'test_' . time() . '.txt';
                     $test_content = 'Test upload file - ' . date('Y-m-d H:i:s');
+                    
+                    echo '<p class="mt-3">Mencoba menulis test file ke: <br><code>' . htmlspecialchars($test_file) . '</code></p>';
+                    
+                    // Coba beberapa metode write
+                    $write_result = false;
+                    $write_method = '';
+                    
+                    // Method 1: file_put_contents
                     $write_result = @file_put_contents($test_file, $test_content);
                     if ($write_result !== false) {
+                        $write_method = 'file_put_contents';
+                    }
+                    
+                    // Method 2: fopen + fwrite
+                    if (!$write_result) {
+                        $fp = @fopen($test_file, 'w');
+                        if ($fp) {
+                            $write_result = @fwrite($fp, $test_content);
+                            @fclose($fp);
+                            if ($write_result !== false) {
+                                $write_method = 'fopen+fwrite';
+                            }
+                        }
+                    }
+                    
+                    // Method 3: touch + file_put_contents
+                    if (!$write_result) {
+                        if (@touch($test_file)) {
+                            $write_result = @file_put_contents($test_file, $test_content);
+                            if ($write_result !== false) {
+                                $write_method = 'touch+file_put_contents';
+                            }
+                        }
+                    }
+                    
+                    if ($write_result !== false) {
+                        echo '<div class="alert alert-success mt-3">';
                         echo '<span class="badge bg-success">Berhasil menulis test file!</span><br>';
+                        echo '<small>Method: <code>' . $write_method . '</code></small><br>';
                         echo '<small>File: <code>' . htmlspecialchars(basename($test_file)) . '</code> (' . $write_result . ' bytes)</small>';
+                        
+                        // Verify file exists
+                        if (file_exists($test_file)) {
+                            echo '<br><small class="text-success">✓ File verified exists</small>';
+                        }
+                        echo '</div>';
                         
                         // Try to delete test file
                         if (@unlink($test_file)) {
-                            echo '<br><span class="badge bg-success">Berhasil menghapus test file!</span>';
+                            echo '<span class="badge bg-success">Berhasil menghapus test file!</span>';
                         } else {
-                            echo '<br><span class="badge bg-warning">Test file masih ada (gagal delete, tidak masalah)</span>';
+                            echo '<span class="badge bg-warning">Test file masih ada (gagal delete, tidak masalah)</span>';
+                            echo '<br><small>File: <code>' . htmlspecialchars($test_file) . '</code></small>';
                         }
                     } else {
-                        echo '<span class="badge bg-danger">Gagal menulis test file!</span>';
+                        echo '<div class="alert alert-danger mt-3">';
+                        echo '<span class="badge bg-danger">Gagal menulis test file dengan semua metode!</span>';
                         $error = error_get_last();
                         if ($error) {
-                            echo '<br><small class="text-danger">Error: ' . htmlspecialchars($error['message']) . '</small>';
+                            echo '<br><small class="text-danger"><strong>Error:</strong> ' . htmlspecialchars($error['message']) . '</small>';
                         }
+                        
+                        echo '<br><br><strong>Kemungkinan penyebab:</strong>';
+                        echo '<ul>';
+                        echo '<li>Folder tidak writable (permission tidak cukup atau owner salah)</li>';
+                        echo '<li>Owner folder bukan user web server (www-data, apache, nginx, dll)</li>';
+                        echo '<li>SELinux atau security policy memblokir write</li>';
+                        echo '<li>Disk quota penuh</li>';
+                        echo '<li>Folder diproteksi oleh hosting provider</li>';
+                        echo '</ul>';
+                        
+                        echo '<br><strong>Solusi yang bisa dicoba:</strong>';
+                        echo '<ol>';
+                        echo '<li><strong>Via File Manager hosting:</strong><br>';
+                        echo '  - Buka File Manager di cPanel/hosting panel<br>';
+                        echo '  - Navigate ke folder <code>uploads/media/</code><br>';
+                        echo '  - Right click → Change Permissions → Set ke <code>777</code> atau <code>755</code><br>';
+                        echo '  - Atau ubah owner ke user web server</li>';
+                        echo '<li><strong>Via SSH/Terminal (jika tersedia):</strong><br>';
+                        echo '  <code>chmod -R 777 uploads/media/</code><br>';
+                        echo '  <code>chown -R www-data:www-data uploads/media/</code> (atau user web server lainnya)</li>';
+                        echo '<li><strong>Via cPanel File Manager:</strong><br>';
+                        echo '  - Buka File Manager → uploads → media<br>';
+                        echo '  - Klik "Change Permissions" → Centang semua (777)</li>';
+                        echo '<li>Jika masih gagal, hubungi support hosting untuk set permission/owner yang benar</li>';
+                        echo '</ol>';
+                        echo '</div>';
                     }
                 }
                 
@@ -158,8 +262,9 @@ header('Content-Type: text/html; charset=utf-8');
                         echo '<tbody>';
                         foreach ($media_records as $media) {
                             $file_exists_rel = file_exists($media['file_path']);
-                            $file_exists_abs = file_exists(__DIR__ . '/../' . $media['file_path']);
-                            $file_exists = $file_exists_rel || $file_exists_abs;
+                            $file_exists_abs = file_exists(dirname(__DIR__) . '/' . $media['file_path']);
+                            $file_exists_abs2 = file_exists(__DIR__ . '/../' . $media['file_path']);
+                            $file_exists = $file_exists_rel || $file_exists_abs || $file_exists_abs2;
                             
                             echo '<tr>';
                             echo '<td>' . $media['id'] . '</td>';
