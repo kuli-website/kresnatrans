@@ -350,12 +350,33 @@
                         $features = json_decode($bus['features'], true) ?: [];
                     }
                     
-                    // Get image
+                    // Get image dengan fallback yang lebih baik
+                    $image_url = null;
                     if (!empty($bus['image_path'])) {
-                        $image_url = $bus['image_path'];
-                    } elseif (!empty($bus['media_key'])) {
-                        $image_url = getMediaUrl($bus['media_key'], $bus['default_image'] ?? 'img/bus1.png');
-                    } else {
+                        // Cek file dengan path relatif
+                        $check_path = ltrim($bus['image_path'], '/');
+                        if (file_exists($check_path)) {
+                            $image_url = $bus['image_path'];
+                        } else {
+                            // Coba dengan path dari root
+                            $check_path2 = __DIR__ . '/' . ltrim($bus['image_path'], '/');
+                            if (file_exists($check_path2)) {
+                                $image_url = $bus['image_path'];
+                            }
+                        }
+                    }
+                    
+                    // Jika belum dapat, coba dari media_key
+                    if (!$image_url && !empty($bus['media_key'])) {
+                        $image_url = getMediaUrl($bus['media_key'], '');
+                        // Verifikasi file ada
+                        if (!empty($image_url) && !file_exists(ltrim($image_url, '/'))) {
+                            $image_url = null;
+                        }
+                    }
+                    
+                    // Fallback terakhir ke default image
+                    if (!$image_url) {
                         $image_url = $bus['default_image'] ?? 'img/bus1.png';
                     }
                     

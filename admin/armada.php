@@ -31,21 +31,45 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $image_path = null;
             if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
                 if (empty($media_key)) {
-                    $media_key = 'armada_' . strtolower(str_replace(' ', '_', $name));
+                    $media_key = 'armada_' . strtolower(str_replace(' ', '_', $name)) . '_' . time();
                 }
                 
                 $result = uploadMedia($_FILES['image'], $media_key, 'armada', $name . ' - ' . $capacity, $name, $_SESSION['admin_id']);
-                if ($result) {
+                if ($result && is_array($result) && !empty($result['file_path'])) {
+                    // Gunakan file_path dari result uploadMedia
+                    $image_path = $result['file_path'];
+                } else {
+                    // Fallback: coba ambil dari getMediaByKey
                     $media = getMediaByKey($media_key);
-                    if ($media) {
+                    if ($media && !empty($media['file_path'])) {
                         $image_path = $media['file_path'];
                     }
                 }
+                
+                // Log untuk debugging
+                if (empty($image_path)) {
+                    error_log("Warning: Upload berhasil tapi image_path kosong untuk media_key: " . $media_key);
+                }
             } elseif (!empty($media_key)) {
-                // Use existing media
+                // Use existing media (jika tidak ada upload baru)
                 $media = getMediaByKey($media_key);
-                if ($media) {
+                if ($media && !empty($media['file_path'])) {
                     $image_path = $media['file_path'];
+                }
+            }
+            
+            // Jika edit dan tidak ada upload baru, pertahankan image_path yang ada
+            if ($action == 'update' && empty($image_path) && !empty($_POST['id'])) {
+                $id = intval($_POST['id']);
+                try {
+                    $stmt = $conn->prepare("SELECT image_path FROM armada WHERE id = ?");
+                    $stmt->execute([$id]);
+                    $existing = $stmt->fetch(PDO::FETCH_ASSOC);
+                    if ($existing && !empty($existing['image_path'])) {
+                        $image_path = $existing['image_path'];
+                    }
+                } catch(PDOException $e) {
+                    error_log("Error getting existing image_path: " . $e->getMessage());
                 }
             }
             
@@ -152,11 +176,38 @@ include __DIR__ . '/includes/header.php';
                 <?php foreach ($armada_list as $armada): ?>
                     <div class="col-md-6 col-lg-4">
                         <div class="card h-100 shadow-sm" style="border: 1px solid #e5e7eb;">
-                            <?php if ($armada['image_path']): ?>
-                                <img src="../<?php echo htmlspecialchars($armada['image_path']); ?>" 
+                            <?php 
+                            $image_src = null;
+                            if (!empty($armada['image_path'])) {
+                                // Cek file dengan path relatif dari admin folder
+                                $rel_path = '../' . ltrim($armada['image_path'], '/');
+                                $abs_path = __DIR__ . '/../' . ltrim($armada['image_path'], '/');
+                                
+                                if (file_exists($rel_path)) {
+                                    $image_src = $rel_path;
+                                } elseif (file_exists($abs_path)) {
+                                    $image_src = $rel_path; // Tetap gunakan relative untuk display
+                                } elseif (file_exists($armada['image_path'])) {
+                                    $image_src = '../' . ltrim($armada['image_path'], '/');
+                                }
+                            }
+                            // Jika tidak ada image_path tapi ada media_key, coba ambil dari media
+                            if (!$image_src && !empty($armada['media_key'])) {
+                                $media = getMediaByKey($armada['media_key']);
+                                if ($media && !empty($media['file_path'])) {
+                                    $rel_path = '../' . ltrim($media['file_path'], '/');
+                                    if (file_exists($rel_path) || file_exists(__DIR__ . '/../' . ltrim($media['file_path'], '/'))) {
+                                        $image_src = $rel_path;
+                                    }
+                                }
+                            }
+                            ?>
+                            <?php if ($image_src): ?>
+                                <img src="<?php echo htmlspecialchars($image_src); ?>" 
                                      class="card-img-top" 
                                      alt="<?php echo htmlspecialchars($armada['name']); ?>"
-                                     style="height: 200px; object-fit: cover;">
+                                     style="height: 200px; object-fit: cover;"
+                                     onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'200\'%3E%3Crect fill=\'%23e5e7eb\' width=\'400\' height=\'200\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' text-anchor=\'middle\' dy=\'.3em\' fill=\'%23999\' font-family=\'sans-serif\' font-size=\'14\'%3EGambar tidak ditemukan%3C/text%3E%3C/svg%3E';">
                             <?php else: ?>
                                 <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
                                     <i class="fas fa-bus fa-3x text-muted"></i>
@@ -260,15 +311,35 @@ include __DIR__ . '/includes/header.php';
                         <div class="col-md-12">
                             <label class="form-label">Gambar Armada</label>
                             <input type="file" name="image" class="form-control" accept="image/*">
-                            <?php if ($edit_data && $edit_data['image_path']): ?>
+                            <?php if ($edit_data && !empty($edit_data['image_path'])): 
+                                $edit_img_src = null;
+                                $rel_path = '../' . ltrim($edit_data['image_path'], '/');
+                                $abs_path = __DIR__ . '/../' . ltrim($edit_data['image_path'], '/');
+                                
+                                if (file_exists($rel_path)) {
+                                    $edit_img_src = $rel_path;
+                                } elseif (file_exists($abs_path)) {
+                                    $edit_img_src = $rel_path;
+                                } elseif (file_exists($edit_data['image_path'])) {
+                                    $edit_img_src = '../' . ltrim($edit_data['image_path'], '/');
+                                }
+                            ?>
                                 <small class="text-muted d-block mt-1">
-                                    Gambar saat ini: <a href="../<?php echo htmlspecialchars($edit_data['image_path']); ?>" target="_blank"><?php echo htmlspecialchars($edit_data['image_path']); ?></a>
+                                    Gambar saat ini: <code><?php echo htmlspecialchars($edit_data['image_path']); ?></code>
+                                    <?php if ($edit_img_src): ?>
+                                        <a href="<?php echo htmlspecialchars($edit_img_src); ?>" target="_blank" class="ms-2">Lihat</a>
+                                    <?php else: ?>
+                                        <span class="text-danger ms-2">(File tidak ditemukan)</span>
+                                    <?php endif; ?>
                                 </small>
-                                <img src="../<?php echo htmlspecialchars($edit_data['image_path']); ?>" 
-                                     class="img-thumbnail mt-2" 
-                                     style="max-width: 200px; max-height: 150px;">
+                                <?php if ($edit_img_src): ?>
+                                    <img src="<?php echo htmlspecialchars($edit_img_src); ?>" 
+                                         class="img-thumbnail mt-2" 
+                                         style="max-width: 200px; max-height: 150px;"
+                                         onerror="this.style.display='none';">
+                                <?php endif; ?>
                             <?php endif; ?>
-                            <small class="text-muted d-block mt-1">Format: JPG, PNG, GIF. Max: 5MB</small>
+                            <small class="text-muted d-block mt-1">Format: JPG, PNG, GIF, WebP. Max: 5MB</small>
                         </div>
                         
                         <div class="col-md-12">
