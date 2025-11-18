@@ -315,6 +315,10 @@ $current_admin = getCurrentAdmin();
                         }
                         ?>
                     </a>
+                    <a class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'armada.php') ? 'active' : ''; ?>" href="armada.php">
+                        <i class="fas fa-bus"></i>
+                        <span>Armada Bus</span>
+                    </a>
                     <a class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'media.php') ? 'active' : ''; ?>" href="media.php">
                         <i class="fas fa-images"></i>
                         <span>Media/Foto</span>
