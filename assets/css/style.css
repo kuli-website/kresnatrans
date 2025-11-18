@@ -3,15 +3,15 @@
    ============================================ */
 
 :root {
-    --primary-color: #001F3F;
-    --primary-dark: #001228;
-    --primary-light: #334C66;
-    --secondary-color: #B8860B; 
-    --accent-color: #CC3333;
+    --primary-color: #1C3B20;
+    --primary-dark: #142918;
+    --primary-light: #2E5F33;
+    --secondary-color: #C79A46;
+    --accent-color: #B42A2A;
     --text-dark: #1f2937;
     --text-gray: #4B5563;
     --text-light: #9CA3AF;
-    --bg-light: #F5F7FA;
+    --bg-light: #F7F7F7;
     --bg-white: #ffffff;
     --border-color: #E0E6EF;
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
