@@ -34,21 +34,38 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $media_key = 'armada_' . strtolower(str_replace(' ', '_', $name)) . '_' . time();
                 }
                 
+                // Debug log sebelum upload
+                error_log("Starting upload - File: " . $_FILES['image']['name'] . ", Size: " . $_FILES['image']['size'] . ", Error: " . $_FILES['image']['error']);
+                error_log("Media key: " . $media_key);
+                
                 $result = uploadMedia($_FILES['image'], $media_key, 'armada', $name . ' - ' . $capacity, $name, $_SESSION['admin_id']);
+                
+                // Debug log setelah upload
+                error_log("Upload result: " . ($result ? 'SUCCESS' : 'FAILED'));
+                if ($result) {
+                    error_log("Upload result data: " . print_r($result, true));
+                }
+                
                 if ($result && is_array($result) && !empty($result['file_path'])) {
                     // Gunakan file_path dari result uploadMedia
                     $image_path = $result['file_path'];
+                    error_log("Using file_path from result: " . $image_path);
                 } else {
                     // Fallback: coba ambil dari getMediaByKey
                     $media = getMediaByKey($media_key);
                     if ($media && !empty($media['file_path'])) {
                         $image_path = $media['file_path'];
+                        error_log("Using file_path from getMediaByKey: " . $image_path);
                     }
                 }
                 
                 // Log untuk debugging
                 if (empty($image_path)) {
                     error_log("Warning: Upload berhasil tapi image_path kosong untuk media_key: " . $media_key);
+                    $message = 'Gagal upload gambar! Silakan cek error log atau akses debug_upload.php untuk detail.';
+                    $message_type = 'danger';
+                } else {
+                    error_log("Final image_path: " . $image_path);
                 }
             } elseif (!empty($media_key)) {
                 // Use existing media (jika tidak ada upload baru)
