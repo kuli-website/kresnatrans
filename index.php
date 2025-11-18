@@ -73,7 +73,7 @@
         "email": "info@sewabusjogja.com",
         "address": {
             "@type": "PostalAddress",
-            "streetAddress": "Jl. Malioboro No. 123",
+            "streetAddress": "Karang Talun Rt 03, Karang Talun, Imogiri, Bantul, Yogyakarta",
             "addressLocality": "Yogyakarta",
             "postalCode": "55271",
             "addressRegion": "DI Yogyakarta",
