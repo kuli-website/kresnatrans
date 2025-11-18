@@ -4,16 +4,16 @@
 
 :root {
     --primary-color: #2563eb;
-    --primary-dark: #1e40af;
-    --primary-light: #3b82f6;
-    --secondary-color: #10b981;
-    --accent-color: #f59e0b;
+    --primary-dark: #001228;
+    --primary-light: #334C66;
+    --secondary-color: #B8860B;
+    --accent-color: #CC3333;
     --text-dark: #1f2937;
-    --text-gray: #6b7280;
-    --text-light: #9ca3af;
-    --bg-light: #f9fafb;
+    --text-gray: #4B5563;
+    --text-light: #9CA3AF;
+    --bg-light: #F5F7FA;
     --bg-white: #ffffff;
-    --border-color: #e5e7eb;
+    --border-color: #E0E6EF;
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
