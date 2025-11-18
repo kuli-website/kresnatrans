@@ -330,7 +330,8 @@ function uploadMedia($file, $media_key, $category = 'gallery', $alt_text = '', $
     
     // Buat directory jika belum ada dengan error handling yang lebih baik
     $upload_dir = 'uploads/media/';
-    $upload_dir_abs = __DIR__ . '/' . $upload_dir;
+    // Path absolut dari root website (includes folder ada di satu level di bawah root)
+    $upload_dir_abs = dirname(__DIR__) . '/' . $upload_dir;
     
     // Coba buat dengan path relatif dulu (untuk hosting yang menggunakan relative path)
     if (!file_exists($upload_dir) && !is_dir($upload_dir)) {
@@ -378,10 +379,18 @@ function uploadMedia($file, $media_key, $category = 'gallery', $alt_text = '', $
     $file_name = $media_key . '_' . time() . '_' . uniqid() . '.' . $file_extension;
     $file_path = rtrim($final_upload_dir, '/') . '/' . $file_name;
     
+    // Debug: Log path yang akan digunakan
+    error_log("Upload attempt - tmp_name: " . $file['tmp_name'] . ", target: " . $file_path);
+    error_log("Upload directory exists: " . (is_dir($final_upload_dir) ? 'YES' : 'NO') . ", writable: " . (is_writable($final_upload_dir) ? 'YES' : 'NO'));
+    
     // Pindahkan file dengan error handling
     if (!move_uploaded_file($file['tmp_name'], $file_path)) {
         $error = error_get_last();
-        error_log("Failed to move uploaded file: " . ($error['message'] ?? 'Unknown error'));
+        $error_msg = $error['message'] ?? 'Unknown error';
+        error_log("Failed to move uploaded file: " . $error_msg);
+        error_log("Source: " . $file['tmp_name'] . ", Destination: " . $file_path);
+        error_log("Directory exists: " . (file_exists($final_upload_dir) ? 'YES' : 'NO'));
+        error_log("Directory writable: " . (is_writable($final_upload_dir) ? 'YES' : 'NO'));
         
         // Hapus file temp jika gagal
         if (file_exists($file['tmp_name'])) {
@@ -393,8 +402,11 @@ function uploadMedia($file, $media_key, $category = 'gallery', $alt_text = '', $
     // Verifikasi file berhasil dibuat
     if (!file_exists($file_path)) {
         error_log("Uploaded file does not exist after move: " . $file_path);
+        error_log("Absolute path check: " . (file_exists($file_path) ? 'EXISTS' : 'NOT EXISTS'));
         return false;
     }
+    
+    error_log("Upload success - File saved to: " . $file_path);
     
     // Normalize path untuk database (gunakan relative path)
     $db_file_path = 'uploads/media/' . $file_name;
