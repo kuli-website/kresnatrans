@@ -3,15 +3,15 @@
    ============================================ */
 
 :root {
-    --primary-color: #1C3B20;
-    --primary-dark: #142918;
-    --primary-light: #2E5F33;
-    --secondary-color: #C79A46;
-    --accent-color: #B42A2A;
+    --primary-color: #001F3F;
+    --primary-dark: #001228;
+    --primary-light: #334C66;
+    --secondary-color: #B8860B;
+    --accent-color: #CC3333;
     --text-dark: #1f2937;
     --text-gray: #4B5563;
     --text-light: #9CA3AF;
-    --bg-light: #F7F7F7;
+    --bg-light: #F5F7FA;
     --bg-white: #ffffff;
     --border-color: #E0E6EF;
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
@@ -43,7 +43,7 @@ body {
     width: 100%;
     max-width: 100%;
     position: relative;
-    margin: 0; 
+    margin: 0;
     padding-left: 0;
     padding-right: 0;
 }
@@ -299,12 +299,19 @@ a {
 }
 
 .hero-overlay {
-    position: absolute;
+position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, rgba(37, 99, 235, 0.9) 0%, rgba(30, 64, 175, 0.9) 100%);
+    /* Gradien dari Navy Sangat Gelap ke Navy Primer. */
+    background: linear-gradient(
+        135deg, 
+        /* Mulai: Hampir Hitam Navy (95% Opasitas) */
+        rgba(0, 31, 63, 0.95) 0%, 
+        /* Akhir: Navy Primer (90% Opasitas) */
+        rgba(0, 31, 63, 0.9) 100%
+    );
     z-index: 2;
 }
 
