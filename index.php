@@ -291,40 +291,82 @@
             </div>
             <div class="row g-4">
                 <?php
-                $armada = [
-                    [
-                        'name' => 'Big Bus',
-                        'capacity' => '59 Kursi',
-                        'features' => ['AC Dingin', 'Reclining Seat', 'LCD TV', 'Toilet', 'Bagasi Luas'],
-                        'media_key' => 'armada_big_bus',
-                        'default_image' => 'img/bus1.png',
-                        'default_alt' => 'Sewa Big Bus Jogja 59 Kursi - Rental Bus Besar Yogyakarta',
-                        'default_title' => 'Sewa Big Bus Jogja 59 Kursi untuk Wisata dan Dinas'
-                    ],
-                    [
-                        'name' => 'Medium Bus',
-                        'capacity' => '35 Kursi',
-                        'features' => ['AC Dingin', 'Reclining Seat', 'LCD TV', 'Bagasi'],
-                        'media_key' => 'armada_medium_bus',
-                        'default_image' => 'img/bus1.png',
-                        'default_alt' => 'Sewa Medium Bus Jogja 35 Kursi - Rental Bus Sedang Yogyakarta',
-                        'default_title' => 'Sewa Medium Bus Jogja 35 Kursi untuk Perjalanan Menengah'
-                    ],
-                    [
-                        'name' => 'Mini Bus',
-                        'capacity' => '25 Kursi',
-                        'features' => ['AC Dingin', 'Reclining Seat', 'LCD TV', 'Compact'],
-                        'media_key' => 'armada_mini_bus',
-                        'default_image' => 'img/bus1.png',
-                        'default_alt' => 'Sewa Mini Bus Jogja 25 Kursi - Rental Bus Kecil Yogyakarta',
-                        'default_title' => 'Sewa Mini Bus Jogja 25 Kursi untuk Grup Kecil'
-                    ]
-                ];
+                // Get armada from database
+                try {
+                    if (isset($conn) && $conn !== null) {
+                        $armada_query = $conn->query("SELECT * FROM armada WHERE is_active = 1 ORDER BY sort_order ASC, name ASC");
+                        $armada_list = $armada_query->fetchAll(PDO::FETCH_ASSOC);
+                    } else {
+                        $armada_list = [];
+                    }
+                } catch(PDOException $e) {
+                    // Fallback to default data if table doesn't exist
+                    $armada_list = [];
+                }
+                
+                // Fallback default armada if database is empty or table doesn't exist
+                if (empty($armada_list)) {
+                    $armada_list = [
+                        [
+                            'id' => 1,
+                            'name' => 'Big Bus',
+                            'capacity' => '59 Kursi',
+                            'features' => '["AC Dingin","Reclining Seat","LCD TV","Toilet","Bagasi Luas"]',
+                            'image_path' => 'img/bus1.png',
+                            'media_key' => 'armada_big_bus',
+                            'default_image' => 'img/bus1.png',
+                            'default_alt' => 'Sewa Big Bus Jogja 59 Kursi - Rental Bus Besar Yogyakarta',
+                            'default_title' => 'Sewa Big Bus Jogja 59 Kursi untuk Wisata dan Dinas'
+                        ],
+                        [
+                            'id' => 2,
+                            'name' => 'Medium Bus',
+                            'capacity' => '35 Kursi',
+                            'features' => '["AC Dingin","Reclining Seat","LCD TV","Bagasi"]',
+                            'image_path' => 'img/bus1.png',
+                            'media_key' => 'armada_medium_bus',
+                            'default_image' => 'img/bus1.png',
+                            'default_alt' => 'Sewa Medium Bus Jogja 35 Kursi - Rental Bus Sedang Yogyakarta',
+                            'default_title' => 'Sewa Medium Bus Jogja 35 Kursi untuk Perjalanan Menengah'
+                        ],
+                        [
+                            'id' => 3,
+                            'name' => 'Mini Bus',
+                            'capacity' => '25 Kursi',
+                            'features' => '["AC Dingin","Reclining Seat","LCD TV","Compact"]',
+                            'image_path' => 'img/bus1.png',
+                            'media_key' => 'armada_mini_bus',
+                            'default_image' => 'img/bus1.png',
+                            'default_alt' => 'Sewa Mini Bus Jogja 25 Kursi - Rental Bus Kecil Yogyakarta',
+                            'default_title' => 'Sewa Mini Bus Jogja 25 Kursi untuk Grup Kecil'
+                        ]
+                    ];
+                }
 
-                foreach ($armada as $index => $bus) {
-                    $image_url = getMediaUrl($bus['media_key'], $bus['default_image']);
-                    $image_alt = getMediaAlt($bus['media_key'], $bus['default_alt']);
-                    $image_title = getMediaTitle($bus['media_key'], $bus['default_title']);
+                foreach ($armada_list as $index => $bus) {
+                    // Parse features
+                    $features = [];
+                    if (!empty($bus['features'])) {
+                        $features = json_decode($bus['features'], true) ?: [];
+                    }
+                    
+                    // Get image
+                    if (!empty($bus['image_path'])) {
+                        $image_url = $bus['image_path'];
+                    } elseif (!empty($bus['media_key'])) {
+                        $image_url = getMediaUrl($bus['media_key'], $bus['default_image'] ?? 'img/bus1.png');
+                    } else {
+                        $image_url = $bus['default_image'] ?? 'img/bus1.png';
+                    }
+                    
+                    // Get alt and title
+                    if (!empty($bus['media_key'])) {
+                        $image_alt = getMediaAlt($bus['media_key'], $bus['default_alt'] ?? $bus['name'] . ' - ' . $bus['capacity']);
+                        $image_title = getMediaTitle($bus['media_key'], $bus['default_title'] ?? $bus['name'] . ' - ' . $bus['capacity']);
+                    } else {
+                        $image_alt = $bus['default_alt'] ?? $bus['name'] . ' - ' . $bus['capacity'];
+                        $image_title = $bus['default_title'] ?? $bus['name'] . ' - ' . $bus['capacity'];
+                    }
                     
                     echo '<div class="col-md-4" data-aos="fade-up" data-aos-delay="' . ($index * 100) . '">
                         <div class="armada-card">
@@ -333,13 +375,19 @@
                                 <div class="armada-badge">' . htmlspecialchars($bus['capacity'], ENT_QUOTES, 'UTF-8') . '</div>
                             </div>
                             <div class="armada-body">
-                                <h4 class="armada-name">' . htmlspecialchars($bus['name'], ENT_QUOTES, 'UTF-8') . ' - ' . htmlspecialchars($bus['capacity'], ENT_QUOTES, 'UTF-8') . '</h4>
-                                <ul class="armada-features">';
-                    foreach ($bus['features'] as $feature) {
-                        echo '<li><i class="fas fa-check"></i> ' . htmlspecialchars($feature, ENT_QUOTES, 'UTF-8') . '</li>';
+                                <h4 class="armada-name">' . htmlspecialchars($bus['name'], ENT_QUOTES, 'UTF-8') . ' - ' . htmlspecialchars($bus['capacity'], ENT_QUOTES, 'UTF-8') . '</h4>';
+                    
+                    if (!empty($features)) {
+                        echo '<ul class="armada-features">';
+                        foreach ($features as $feature) {
+                            if (!empty($feature)) {
+                                echo '<li><i class="fas fa-check"></i> ' . htmlspecialchars($feature, ENT_QUOTES, 'UTF-8') . '</li>';
+                            }
+                        }
+                        echo '</ul>';
                     }
-                    echo '</ul>
-                                <a href="#contact" class="btn btn-outline-primary w-100 mt-3" aria-label="Pesan ' . htmlspecialchars($bus['name'], ENT_QUOTES, 'UTF-8') . ' sekarang">Pesan Sekarang</a>
+                    
+                    echo '<a href="#contact" class="btn btn-outline-primary w-100 mt-3" aria-label="Pesan ' . htmlspecialchars($bus['name'], ENT_QUOTES, 'UTF-8') . ' sekarang">Pesan Sekarang</a>
                             </div>
                         </div>
                     </div>';
