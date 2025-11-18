@@ -23,8 +23,8 @@
     <meta property="og:description" content="Sewa Bus Jogja terpercaya sejak 2010. Layanan rental bus Yogyakarta dengan armada modern, driver profesional, harga terjangkau. Melayani wisata, dinas, acara keluarga.">
     <?php
     // Get images from database
-    $og_image = getMediaUrl('og_image', 'img/bus1.png');
-    $favicon = getMediaUrl('favicon', 'img/logobus.png');
+    $og_image = getMediaUrl('og_image', 'img/logobg.png');
+    $favicon = getMediaUrl('favicon', 'img/logobg.png');
     $site_url = 'https://www.sewabusjogja.com';
     ?>
     <meta property="og:image" content="<?php echo htmlspecialchars($site_url . '/' . $og_image); ?>">
@@ -556,7 +556,7 @@
                                 </div>
                                 <div class="contact-details">
                                     <h5>Alamat</h5>
-                                    <p>Jl. Malioboro No. 123, Yogyakarta 55271</p>
+                                    <p>Karang Talun Rt 03, Karang Talun, Imogiri, Bantul, Yogyakarta</p>
                                 </div>
                             </div>
                             <div class="contact-item">
