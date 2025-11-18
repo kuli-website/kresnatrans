@@ -328,21 +328,76 @@ function uploadMedia($file, $media_key, $category = 'gallery', $alt_text = '', $
         return false;
     }
     
-    // Buat directory jika belum ada
+    // Buat directory jika belum ada dengan error handling yang lebih baik
     $upload_dir = 'uploads/media/';
-    if (!file_exists($upload_dir)) {
-        mkdir($upload_dir, 0755, true);
+    $upload_dir_abs = __DIR__ . '/' . $upload_dir;
+    
+    // Coba buat dengan path relatif dulu (untuk hosting yang menggunakan relative path)
+    if (!file_exists($upload_dir) && !is_dir($upload_dir)) {
+        // Cek dan buat folder parent terlebih dahulu
+        $parent_dir = dirname($upload_dir);
+        if (!file_exists($parent_dir) && !is_dir($parent_dir)) {
+            @mkdir($parent_dir, 0755, true);
+        }
+        
+        // Buat folder uploads/media dengan recursive
+        $result = @mkdir($upload_dir, 0755, true);
+        
+        // Jika gagal dengan relative path, coba absolute path
+        if (!$result && !file_exists($upload_dir)) {
+            if (!file_exists($upload_dir_abs) && !is_dir($upload_dir_abs)) {
+                $parent_abs = dirname($upload_dir_abs);
+                if (!file_exists($parent_abs) && !is_dir($parent_abs)) {
+                    @mkdir($parent_abs, 0755, true);
+                }
+                @mkdir($upload_dir_abs, 0755, true);
+            }
+        }
+    }
+    
+    // Verifikasi folder bisa ditulis
+    if (!is_dir($upload_dir) && !is_dir($upload_dir_abs)) {
+        error_log("Failed to create upload directory: " . $upload_dir);
+        return false;
+    }
+    
+    // Pilih direktori yang berhasil dibuat
+    $final_upload_dir = is_dir($upload_dir) ? $upload_dir : $upload_dir_abs;
+    
+    // Pastikan direktori writable
+    if (!is_writable($final_upload_dir)) {
+        @chmod($final_upload_dir, 0755);
+        // Jika masih tidak bisa write, coba 0777 (untuk shared hosting)
+        if (!is_writable($final_upload_dir)) {
+            @chmod($final_upload_dir, 0777);
+        }
     }
     
     // Generate nama file unik
-    $file_extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+    $file_extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
     $file_name = $media_key . '_' . time() . '_' . uniqid() . '.' . $file_extension;
-    $file_path = $upload_dir . $file_name;
+    $file_path = rtrim($final_upload_dir, '/') . '/' . $file_name;
     
-    // Pindahkan file
+    // Pindahkan file dengan error handling
     if (!move_uploaded_file($file['tmp_name'], $file_path)) {
+        $error = error_get_last();
+        error_log("Failed to move uploaded file: " . ($error['message'] ?? 'Unknown error'));
+        
+        // Hapus file temp jika gagal
+        if (file_exists($file['tmp_name'])) {
+            @unlink($file['tmp_name']);
+        }
         return false;
     }
+    
+    // Verifikasi file berhasil dibuat
+    if (!file_exists($file_path)) {
+        error_log("Uploaded file does not exist after move: " . $file_path);
+        return false;
+    }
+    
+    // Normalize path untuk database (gunakan relative path)
+    $db_file_path = 'uploads/media/' . $file_name;
     
     // Get image dimensions
     $image_info = getimagesize($file_path);
@@ -358,8 +413,18 @@ function uploadMedia($file, $media_key, $category = 'gallery', $alt_text = '', $
         if ($existing) {
             // Hapus file lama jika ada
             $old_media = getMedia($media_key);
-            if ($old_media && file_exists($old_media['file_path'])) {
-                unlink($old_media['file_path']);
+            if ($old_media && !empty($old_media['file_path'])) {
+                $old_file_path = $old_media['file_path'];
+                // Coba relative path dulu
+                if (file_exists($old_file_path)) {
+                    @unlink($old_file_path);
+                } else {
+                    // Coba absolute path
+                    $old_file_abs = __DIR__ . '/' . $old_file_path;
+                    if (file_exists($old_file_abs)) {
+                        @unlink($old_file_abs);
+                    }
+                }
             }
             
             // Update existing media
@@ -381,7 +446,7 @@ function uploadMedia($file, $media_key, $category = 'gallery', $alt_text = '', $
             $stmt->execute([
                 $category,
                 $file['name'],
-                $file_path,
+                $db_file_path,
                 $mime_type,
                 $file['size'],
                 $width,
@@ -402,7 +467,7 @@ function uploadMedia($file, $media_key, $category = 'gallery', $alt_text = '', $
             $stmt->execute([
                 $media_key,
                 $file['name'],
-                $file_path,
+                $db_file_path,
                 'image',
                 $mime_type,
                 $file['size'],
@@ -420,7 +485,7 @@ function uploadMedia($file, $media_key, $category = 'gallery', $alt_text = '', $
         error_log("Error uploading media: " . $e->getMessage());
         // Delete uploaded file if database insert fails
         if (file_exists($file_path)) {
-            unlink($file_path);
+            @unlink($file_path);
         }
         return false;
     }
@@ -442,10 +507,17 @@ function deleteMedia($media_key) {
     try {
         $media = getMedia($media_key);
         
-        if ($media) {
-            // Delete file
-            if (file_exists($media['file_path'])) {
-                unlink($media['file_path']);
+        if ($media && !empty($media['file_path'])) {
+            // Delete file - coba relative path dulu
+            $media_path = $media['file_path'];
+            if (file_exists($media_path)) {
+                @unlink($media_path);
+            } else {
+                // Coba absolute path
+                $media_path_abs = __DIR__ . '/' . $media_path;
+                if (file_exists($media_path_abs)) {
+                    @unlink($media_path_abs);
+                }
             }
             
             // Delete from database
