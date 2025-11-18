@@ -139,7 +139,6 @@
         <div class="container">
             <a class="navbar-brand" href="#home">
                 <?php echo getMediaImage('logo_navbar', 'img/logobus.png', 'Sewa Bus Jogja - Rental Bus Yogyakarta', 'navbar-logo'); ?>
-                <h2 style="font-size: 1.5rem; font-weight: 600; color: #001F3F;">PT KRESNA UTAMA TRANS WISATA</h2>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
