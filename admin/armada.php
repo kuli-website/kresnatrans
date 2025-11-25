@@ -70,7 +70,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
     try {
         if ($action == 'create' || $action == 'update') {
-            $id = intval($_POST['id'] ?? 0);
+            // Get ID hanya jika action = update
+            $id = ($action == 'update') ? intval($_POST['id'] ?? 0) : 0;
+            
             $name = trim($_POST['name'] ?? '');
             $capacity = trim($_POST['capacity'] ?? '');
             $description = trim($_POST['description'] ?? '');
@@ -79,13 +81,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $is_active = isset($_POST['is_active']) ? 1 : 0;
             
             // Handle image upload - SIMPLE: langsung ke folder
+            $image_path = null;
             if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-                $image_path = uploadArmadaImage($_FILES['image']);
-                if (!$image_path) {
+                $uploaded_path = uploadArmadaImage($_FILES['image']);
+                if ($uploaded_path) {
+                    $image_path = $uploaded_path;
+                } else {
                     $message = 'Gagal upload gambar! Pastikan file adalah gambar valid (JPG, PNG, GIF, WebP) dan ukuran maksimal 5MB.';
                     $message_type = 'danger';
                 }
-            } elseif ($action == 'update' && !empty($_POST['id'])) {
+            } elseif ($action == 'update' && $id > 0) {
                 // Jika edit dan tidak ada upload baru, pertahankan image_path yang ada
                 try {
                     $stmt = $conn->prepare("SELECT image_path FROM armada WHERE id = ?");
@@ -99,50 +104,75 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 }
             }
             
-            // Jika ada error message dan upload penting, jangan lanjutkan
-            // (Untuk create, upload tidak wajib, tapi untuk update kita tetap lanjut)
-            
             // Generate slug otomatis (untuk kompatibilitas database)
             $slug = strtolower(str_replace(' ', '-', $name)) . '-' . strtolower(str_replace(' ', '-', $capacity));
             $slug = preg_replace('/[^a-z0-9-]/', '', $slug);
             
             if ($action == 'create') {
-                // Check if slug exists
-                $checkSlug = $conn->prepare("SELECT id FROM armada WHERE slug = ?");
-                $checkSlug->execute([$slug]);
-                if ($checkSlug->rowCount() > 0) {
-                    $slug .= '-' . time();
-                }
-                
-                // Insert - sederhana: hanya kolom penting
-                try {
-                    $stmt = $conn->prepare("INSERT INTO armada (name, capacity, slug, image_path, features, description, sort_order, is_active) VALUES (?, ?, ?, ?, ?, ?, 0, ?)");
-                    $stmt->execute([$name, $capacity, $slug, $image_path, $features_json, $description, $is_active]);
-                    
-                    $message = !empty($image_path) ? 'Armada berhasil ditambahkan!' : 'Armada berhasil ditambahkan! (Belum ada gambar)';
-                    $message_type = 'success';
-                } catch(PDOException $e) {
-                    $message = 'Error: Gagal menyimpan data armada. ' . $e->getMessage();
+                // CREATE - Pastikan tidak ada ID
+                if (!empty($_POST['id'])) {
+                    // Jika ada ID, ini seharusnya update, bukan create
+                    $message = 'Error: Form dalam mode create tidak boleh memiliki ID.';
                     $message_type = 'danger';
-                }
-            } else {
-                // Update - sederhana
-                try {
-                    // Jika ada image_path baru, update. Jika tidak, pertahankan yang lama.
-                    if (!empty($image_path)) {
-                        $stmt = $conn->prepare("UPDATE armada SET name = ?, capacity = ?, slug = ?, image_path = ?, features = ?, description = ?, is_active = ? WHERE id = ?");
-                        $stmt->execute([$name, $capacity, $slug, $image_path, $features_json, $description, $is_active, $id]);
-                    } else {
-                        // Tidak update image_path jika kosong (pertahankan yang lama)
-                        $stmt = $conn->prepare("UPDATE armada SET name = ?, capacity = ?, slug = ?, features = ?, description = ?, is_active = ? WHERE id = ?");
-                        $stmt->execute([$name, $capacity, $slug, $features_json, $description, $is_active, $id]);
+                } else {
+                    // Check if slug exists
+                    $checkSlug = $conn->prepare("SELECT id FROM armada WHERE slug = ?");
+                    $checkSlug->execute([$slug]);
+                    if ($checkSlug->rowCount() > 0) {
+                        $slug .= '-' . time();
                     }
                     
-                    $message = 'Armada berhasil diupdate!';
-                    $message_type = 'success';
-                } catch(PDOException $e) {
-                    $message = 'Error: Gagal mengupdate data armada. ' . $e->getMessage();
+                    // Insert - sederhana: hanya kolom penting
+                    try {
+                        $stmt = $conn->prepare("INSERT INTO armada (name, capacity, slug, image_path, features, description, sort_order, is_active) VALUES (?, ?, ?, ?, ?, ?, 0, ?)");
+                        $stmt->execute([$name, $capacity, $slug, $image_path, $features_json, $description, $is_active]);
+                        
+                        $message = !empty($image_path) ? 'Armada berhasil ditambahkan!' : 'Armada berhasil ditambahkan! (Belum ada gambar)';
+                        $message_type = 'success';
+                        
+                        // Redirect untuk refresh dan reset form
+                        header("Location: armada.php?success=1");
+                        exit;
+                    } catch(PDOException $e) {
+                        $message = 'Error: Gagal menyimpan data armada. ' . $e->getMessage();
+                        $message_type = 'danger';
+                    }
+                }
+            } else {
+                // UPDATE - Pastikan ada ID yang valid
+                if (empty($id) || $id <= 0) {
+                    $message = 'Error: ID tidak valid untuk update.';
                     $message_type = 'danger';
+                } else {
+                    try {
+                        // Verifikasi ID ada di database
+                        $checkId = $conn->prepare("SELECT id FROM armada WHERE id = ?");
+                        $checkId->execute([$id]);
+                        if ($checkId->rowCount() == 0) {
+                            $message = 'Error: Armada dengan ID tersebut tidak ditemukan.';
+                            $message_type = 'danger';
+                        } else {
+                            // Update dengan WHERE id yang eksplisit
+                            if (!empty($image_path)) {
+                                $stmt = $conn->prepare("UPDATE armada SET name = ?, capacity = ?, slug = ?, image_path = ?, features = ?, description = ?, is_active = ? WHERE id = ?");
+                                $stmt->execute([$name, $capacity, $slug, $image_path, $features_json, $description, $is_active, $id]);
+                            } else {
+                                // Tidak update image_path jika kosong (pertahankan yang lama)
+                                $stmt = $conn->prepare("UPDATE armada SET name = ?, capacity = ?, slug = ?, features = ?, description = ?, is_active = ? WHERE id = ?");
+                                $stmt->execute([$name, $capacity, $slug, $features_json, $description, $is_active, $id]);
+                            }
+                            
+                            $message = 'Armada berhasil diupdate!';
+                            $message_type = 'success';
+                            
+                            // Redirect untuk refresh dan reset form
+                            header("Location: armada.php?success=1");
+                            exit;
+                        }
+                    } catch(PDOException $e) {
+                        $message = 'Error: Gagal mengupdate data armada. ' . $e->getMessage();
+                        $message_type = 'danger';
+                    }
                 }
             }
         } elseif ($action == 'delete') {
@@ -158,6 +188,36 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
+// Handle success message from redirect
+if (isset($_GET['success'])) {
+    $message = 'Operasi berhasil!';
+    $message_type = 'success';
+}
+
+// Reset edit_data jika tidak ada parameter edit (penting untuk mencegah form masih dalam mode edit)
+$edit_data = null;
+
+// Get edit data only if edit parameter exists
+if (isset($_GET['edit'])) {
+    $edit_id = intval($_GET['edit']);
+    try {
+        $stmt = $conn->prepare("SELECT * FROM armada WHERE id = ?");
+        $stmt->execute([$edit_id]);
+        $edit_data = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($edit_data) {
+            $edit_data['features'] = json_decode($edit_data['features'] ?? '[]', true) ?: [];
+        } else {
+            // Jika ID tidak ditemukan, redirect
+            header("Location: armada.php?error=not_found");
+            exit;
+        }
+    } catch(PDOException $e) {
+        // Error - redirect
+        header("Location: armada.php?error=database");
+        exit;
+    }
+}
+
 // Get all armada
 try {
     $armada_list = $conn->query("SELECT * FROM armada ORDER BY sort_order ASC, name ASC")->fetchAll(PDO::FETCH_ASSOC);
@@ -169,22 +229,6 @@ try {
     if (strpos($e->getMessage(), "doesn't exist") !== false) {
         $message = 'Tabel armada belum dibuat. <a href="create_armada_table.php">Klik di sini untuk membuat tabel</a>';
         $message_type = 'warning';
-    }
-}
-
-// Get edit data
-$edit_data = null;
-if (isset($_GET['edit'])) {
-    $edit_id = intval($_GET['edit']);
-    try {
-        $stmt = $conn->prepare("SELECT * FROM armada WHERE id = ?");
-        $stmt->execute([$edit_id]);
-        $edit_data = $stmt->fetch(PDO::FETCH_ASSOC);
-        if ($edit_data) {
-            $edit_data['features'] = json_decode($edit_data['features'] ?? '[]', true) ?: [];
-        }
-    } catch(PDOException $e) {
-        // Error
     }
 }
 
@@ -295,9 +339,11 @@ include __DIR__ . '/includes/header.php';
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST" enctype="multipart/form-data" id="armadaForm">
-                <input type="hidden" name="action" value="<?php echo $edit_data ? 'update' : 'create'; ?>">
+                <input type="hidden" name="action" id="formAction" value="<?php echo $edit_data ? 'update' : 'create'; ?>">
                 <?php if ($edit_data): ?>
-                    <input type="hidden" name="id" value="<?php echo $edit_data['id']; ?>">
+                    <input type="hidden" name="id" id="formId" value="<?php echo $edit_data['id']; ?>">
+                <?php else: ?>
+                    <input type="hidden" name="id" id="formId" value="">
                 <?php endif; ?>
                 
                 <div class="modal-body">
@@ -397,9 +443,27 @@ include __DIR__ . '/includes/header.php';
     <input type="hidden" name="id" id="deleteId">
 </form>
 
-<?php if ($edit_data): ?>
 <script>
+    // Event listener untuk reset form saat modal dibuka untuk tambah baru
     document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('armadaModal');
+        if (modal) {
+            modal.addEventListener('show.bs.modal', function(event) {
+                // Jika modal dibuka dari button "Tambah Armada" (bukan dari edit)
+                const button = event.relatedTarget;
+                if (!button || !button.getAttribute('data-edit-id')) {
+                    resetForm();
+                }
+            });
+            
+            modal.addEventListener('hidden.bs.modal', function() {
+                // Reset form saat modal ditutup
+                resetForm();
+            });
+        }
+        
+        // Auto-show modal jika ada edit_data
+        <?php if ($edit_data): ?>
         try {
             if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
                 const modalElement = document.getElementById('armadaModal');
@@ -411,24 +475,67 @@ include __DIR__ . '/includes/header.php';
         } catch (e) {
             console.error('Error showing modal:', e);
         }
+        <?php endif; ?>
     });
 </script>
-<?php endif; ?>
 
 <script>
 function resetForm() {
     try {
         const form = document.getElementById('armadaForm');
         if (form) {
+            // Reset semua field
             form.reset();
-        }
-        const actionInput = document.querySelector('input[name="action"]');
-        if (actionInput) {
-            actionInput.value = 'create';
-        }
-        const featuresContainer = document.getElementById('featuresContainer');
-        if (featuresContainer) {
-            featuresContainer.innerHTML = '<div class="input-group mb-2 feature-item"><input type="text" name="features[]" class="form-control" placeholder="Contoh: AC Dingin"><button type="button" class="btn btn-outline-danger" onclick="removeFeature(this)"><i class="fas fa-times"></i></button></div>';
+            
+            // Pastikan action = create
+            const actionInput = document.getElementById('formAction');
+            if (actionInput) {
+                actionInput.value = 'create';
+            }
+            
+            // PENTING: HAPUS atau kosongkan hidden input id
+            const idInput = document.getElementById('formId');
+            if (idInput) {
+                idInput.value = '';
+            }
+            
+            // Reset semua text inputs ke empty
+            const textInputs = form.querySelectorAll('input[type="text"], textarea');
+            textInputs.forEach(input => {
+                if (input.name !== 'action' && input.name !== 'id') {
+                    input.value = '';
+                }
+            });
+            
+            // Reset checkbox
+            const checkbox = form.querySelector('input[type="checkbox"][name="is_active"]');
+            if (checkbox) {
+                checkbox.checked = true; // Default aktif
+            }
+            
+            // Reset features container
+            const featuresContainer = document.getElementById('featuresContainer');
+            if (featuresContainer) {
+                featuresContainer.innerHTML = '<div class="input-group mb-2 feature-item"><input type="text" name="features[]" class="form-control" placeholder="Contoh: AC Dingin"><button type="button" class="btn btn-outline-danger" onclick="removeFeature(this)"><i class="fas fa-times"></i></button></div>';
+            }
+            
+            // Reset file input
+            const fileInput = form.querySelector('input[type="file"]');
+            if (fileInput) {
+                fileInput.value = '';
+            }
+            
+            // Hapus preview gambar jika ada
+            const imgPreview = form.querySelector('.img-thumbnail');
+            if (imgPreview) {
+                imgPreview.style.display = 'none';
+            }
+            
+            // Update modal title
+            const modalTitle = document.querySelector('#armadaModal .modal-title');
+            if (modalTitle) {
+                modalTitle.textContent = 'Tambah Armada Baru';
+            }
         }
     } catch (e) {
         console.error('Error resetting form:', e);
