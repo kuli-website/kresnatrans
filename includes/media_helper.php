@@ -510,6 +510,7 @@ function uploadMedia($file, $media_key, $category = 'gallery', $alt_text = '', $
         $stmt = $conn->prepare("SELECT id FROM media WHERE media_key = ?");
         $stmt->execute([$media_key]);
         $existing = $stmt->fetch(PDO::FETCH_ASSOC);
+        $media_id = $existing ? $existing['id'] : null;
         
         if ($existing) {
             // Hapus file lama jika ada
@@ -587,15 +588,62 @@ function uploadMedia($file, $media_key, $category = 'gallery', $alt_text = '', $
             $stmt = $conn->prepare("SELECT * FROM media WHERE media_key = ? LIMIT 1");
             $stmt->execute([$media_key]);
             $media = $stmt->fetch(PDO::FETCH_ASSOC);
-            if ($media) {
+            if ($media && !empty($media['file_path'])) {
+                error_log("Successfully retrieved media from database: " . $media['file_path']);
                 return $media;
+            } else {
+                error_log("Media found in database but file_path is empty or null");
             }
         } catch(PDOException $e) {
             error_log("Error getting uploaded media: " . $e->getMessage());
         }
         
-        // Fallback ke getMedia jika query langsung gagal
-        return getMedia($media_key);
+        // Fallback: jika query gagal, buat return data manual dengan info yang sudah kita punya
+        // Ini memastikan kita selalu return data dengan file_path yang benar
+        // Jika media_id belum ada, coba ambil lagi dari database
+        if (empty($media_id)) {
+            try {
+                $stmt_id = $conn->prepare("SELECT id FROM media WHERE media_key = ? LIMIT 1");
+                $stmt_id->execute([$media_key]);
+                $media_id_result = $stmt_id->fetch(PDO::FETCH_ASSOC);
+                if ($media_id_result) {
+                    $media_id = $media_id_result['id'];
+                }
+            } catch(PDOException $e) {
+                error_log("Error getting media ID for fallback: " . $e->getMessage());
+            }
+        }
+        
+        error_log("Creating fallback media data with file_path: " . $db_file_path . ", media_id: " . ($media_id ?? 'NULL'));
+        
+        $fallback_media = [
+            'id' => $media_id,
+            'media_key' => $media_key,
+            'file_name' => $file['name'],
+            'file_path' => $db_file_path,
+            'file_type' => 'image',
+            'mime_type' => $mime_type,
+            'file_size' => $file['size'],
+            'width' => $width,
+            'height' => $height,
+            'alt_text' => $alt_text,
+            'title' => $title,
+            'category' => $category,
+            'uploaded_by' => $uploaded_by,
+            'is_active' => 1,
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s')
+        ];
+        
+        // Verifikasi file benar-benar ada
+        $verify_path = $file_path; // Path absolut file yang sudah di-upload
+        if (!file_exists($verify_path)) {
+            error_log("WARNING: Uploaded file does not exist at: " . $verify_path);
+        } else {
+            error_log("Verified: Uploaded file exists at: " . $verify_path);
+        }
+        
+        return $fallback_media;
     } catch(PDOException $e) {
         error_log("Error uploading media: " . $e->getMessage());
         // Delete uploaded file if database insert fails
