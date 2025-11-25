@@ -334,12 +334,24 @@ function uploadMedia($file, $media_key, $category = 'gallery', $alt_text = '', $
     $upload_dir_rel = 'uploads/media/';
     $upload_dir_abs = rtrim($root_dir, '/') . '/' . $upload_dir_rel;
     
+    error_log("=== UPLOADMEDIA DEBUG ===");
     error_log("Upload root_dir: " . $root_dir);
     error_log("Upload dir_abs: " . $upload_dir_abs);
     error_log("Upload dir_rel: " . $upload_dir_rel);
+    error_log("Current working directory: " . getcwd());
     
-    // Prioritaskan absolute path untuk konsistensi
+    // SELALU gunakan absolute path untuk konsistensi (seperti test_upload.php)
+    // Prioritaskan absolute path yang sudah terbukti bekerja
     $target_upload_dir = $upload_dir_abs;
+    
+    // Cek apakah absolute path ada, jika tidak ada coba relative sebagai fallback
+    if (!file_exists($upload_dir_abs) || !is_dir($upload_dir_abs)) {
+        error_log("Absolute path tidak ada, coba relative path");
+        if (file_exists($upload_dir_rel) && is_dir($upload_dir_rel)) {
+            $target_upload_dir = $upload_dir_rel;
+            error_log("Using relative path as fallback");
+        }
+    }
     
     // Cek apakah folder sudah ada
     if (!file_exists($target_upload_dir) || !is_dir($target_upload_dir)) {
