@@ -328,71 +328,106 @@ function uploadMedia($file, $media_key, $category = 'gallery', $alt_text = '', $
         return false;
     }
     
-    // Buat directory jika belum ada dengan error handling yang lebih baik
-    $upload_dir = 'uploads/media/';
-    // Path absolut dari root website (includes folder ada di satu level di bawah root)
-    $upload_dir_abs = dirname(__DIR__) . '/' . $upload_dir;
+    // Tentukan root directory website
+    // media_helper.php ada di includes/, jadi root adalah parent directory
+    $root_dir = dirname(__DIR__);
+    $upload_dir_rel = 'uploads/media/';
+    $upload_dir_abs = rtrim($root_dir, '/') . '/' . $upload_dir_rel;
     
-    // Coba buat dengan path relatif dulu (untuk hosting yang menggunakan relative path)
-    if (!file_exists($upload_dir) && !is_dir($upload_dir)) {
-        // Cek dan buat folder parent terlebih dahulu
-        $parent_dir = dirname($upload_dir);
-        if (!file_exists($parent_dir) && !is_dir($parent_dir)) {
-            @mkdir($parent_dir, 0755, true);
+    error_log("Upload root_dir: " . $root_dir);
+    error_log("Upload dir_abs: " . $upload_dir_abs);
+    error_log("Upload dir_rel: " . $upload_dir_rel);
+    
+    // Prioritaskan absolute path untuk konsistensi
+    $target_upload_dir = $upload_dir_abs;
+    
+    // Cek apakah folder sudah ada
+    if (!file_exists($target_upload_dir) || !is_dir($target_upload_dir)) {
+        // Buat folder parent terlebih dahulu (uploads/)
+        $parent_dir = dirname($target_upload_dir);
+        if (!file_exists($parent_dir) || !is_dir($parent_dir)) {
+            error_log("Creating parent directory: " . $parent_dir);
+            $parent_created = @mkdir($parent_dir, 0777, true);
+            if ($parent_created) {
+                error_log("Parent directory created successfully");
+            } else {
+                error_log("Failed to create parent directory: " . $parent_dir);
+            }
         }
         
         // Buat folder uploads/media dengan recursive
-        $result = @mkdir($upload_dir, 0755, true);
-        
-        // Jika gagal dengan relative path, coba absolute path
-        if (!$result && !file_exists($upload_dir)) {
-            if (!file_exists($upload_dir_abs) && !is_dir($upload_dir_abs)) {
-                $parent_abs = dirname($upload_dir_abs);
-                if (!file_exists($parent_abs) && !is_dir($parent_abs)) {
-                    @mkdir($parent_abs, 0755, true);
+        error_log("Creating upload directory: " . $target_upload_dir);
+        $dir_created = @mkdir($target_upload_dir, 0777, true);
+        if ($dir_created) {
+            error_log("Upload directory created successfully");
+        } else {
+            error_log("Failed to create upload directory: " . $target_upload_dir);
+            // Coba lagi dengan relative path sebagai fallback
+            if (!file_exists($upload_dir_rel) || !is_dir($upload_dir_rel)) {
+                error_log("Trying relative path as fallback: " . $upload_dir_rel);
+                $dir_created = @mkdir($upload_dir_rel, 0777, true);
+                if ($dir_created) {
+                    $target_upload_dir = $upload_dir_rel;
+                    error_log("Upload directory created with relative path");
                 }
-                @mkdir($upload_dir_abs, 0755, true);
+            } else {
+                $target_upload_dir = $upload_dir_rel;
+                error_log("Using existing relative path directory");
             }
         }
     }
     
     // Verifikasi folder bisa ditulis
-    if (!is_dir($upload_dir) && !is_dir($upload_dir_abs)) {
-        error_log("Failed to create upload directory: " . $upload_dir);
+    if (!is_dir($target_upload_dir)) {
+        error_log("Failed: Upload directory does not exist: " . $target_upload_dir);
+        error_log("Absolute path exists: " . (file_exists($upload_dir_abs) ? 'YES' : 'NO'));
+        error_log("Relative path exists: " . (file_exists($upload_dir_rel) ? 'YES' : 'NO'));
         return false;
     }
     
-    // Pilih direktori yang berhasil dibuat
-    $final_upload_dir = is_dir($upload_dir) ? $upload_dir : $upload_dir_abs;
-    
-    // Pastikan direktori writable - coba beberapa permission
-    if (!is_writable($final_upload_dir)) {
+    // Pastikan folder writable - coba beberapa permission
+    $is_writable = is_writable($target_upload_dir);
+    if (!$is_writable) {
+        error_log("Directory is not writable, attempting to fix permissions...");
         // Coba 0777 dulu (untuk shared hosting yang memerlukan permission lebih luas)
-        @chmod($final_upload_dir, 0777);
-        // Jika masih gagal, coba 0755
-        if (!is_writable($final_upload_dir)) {
-            @chmod($final_upload_dir, 0755);
-        }
-        // Jika masih gagal, coba 0775
-        if (!is_writable($final_upload_dir)) {
-            @chmod($final_upload_dir, 0775);
+        @chmod($target_upload_dir, 0777);
+        $is_writable = is_writable($target_upload_dir);
+        
+        if (!$is_writable) {
+            @chmod($target_upload_dir, 0775);
+            $is_writable = is_writable($target_upload_dir);
         }
         
-        // Final check
-        if (!is_writable($final_upload_dir)) {
-            error_log("Directory still not writable after chmod attempts: " . $final_upload_dir);
-            error_log("Current permission: " . substr(sprintf('%o', fileperms($final_upload_dir)), -4));
+        if (!$is_writable) {
+            @chmod($target_upload_dir, 0755);
+            $is_writable = is_writable($target_upload_dir);
+        }
+        
+        if (!$is_writable) {
+            $perms = fileperms($target_upload_dir);
+            error_log("Directory still not writable after chmod attempts: " . $target_upload_dir);
+            error_log("Current permission: " . substr(sprintf('%o', $perms), -4));
+            return false;
+        } else {
+            error_log("Permissions fixed, directory is now writable");
         }
     }
     
     // Pastikan folder parent juga writable
-    $parent_dir = dirname($final_upload_dir);
+    $parent_dir = dirname($target_upload_dir);
     if (is_dir($parent_dir) && !is_writable($parent_dir)) {
-        @chmod($parent_dir, 0755);
+        @chmod($parent_dir, 0777);
         if (!is_writable($parent_dir)) {
-            @chmod($parent_dir, 0777);
+            @chmod($parent_dir, 0775);
+        }
+        if (!is_writable($parent_dir)) {
+            @chmod($parent_dir, 0755);
         }
     }
+    
+    $final_upload_dir = $target_upload_dir;
+    error_log("Final upload directory: " . $final_upload_dir);
+    error_log("Directory writable: " . (is_writable($final_upload_dir) ? 'YES' : 'NO'));
     
     // Generate nama file unik
     $file_extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
@@ -428,8 +463,30 @@ function uploadMedia($file, $media_key, $category = 'gallery', $alt_text = '', $
     
     error_log("Upload success - File saved to: " . $file_path);
     
-    // Normalize path untuk database (gunakan relative path)
-    $db_file_path = 'uploads/media/' . $file_name;
+    // Normalize path untuk database (gunakan relative path dari root website)
+    // Pastikan path selalu relatif, tidak ada absolute path
+    if (strpos($file_path, $root_dir) === 0) {
+        // Jika path absolut, konversi ke relative
+        $db_file_path = str_replace($root_dir . '/', '', $file_path);
+    } else {
+        // Jika sudah relative, gunakan langsung
+        $db_file_path = $file_name;
+        // Pastikan formatnya benar: uploads/media/filename.jpg
+        if (strpos($db_file_path, 'uploads/media/') !== 0) {
+            $db_file_path = 'uploads/media/' . $file_name;
+        }
+    }
+    
+    // Normalize: pastikan tidak ada double slash atau leading slash
+    $db_file_path = str_replace('//', '/', $db_file_path);
+    $db_file_path = ltrim($db_file_path, '/');
+    
+    // Final: pastikan format uploads/media/filename.jpg
+    if (strpos($db_file_path, 'uploads/media/') !== 0) {
+        $db_file_path = 'uploads/media/' . $file_name;
+    }
+    
+    error_log("Database file_path: " . $db_file_path);
     
     // Get image dimensions
     $image_info = getimagesize($file_path);
