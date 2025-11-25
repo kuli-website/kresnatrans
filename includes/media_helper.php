@@ -512,6 +512,20 @@ function uploadMedia($file, $media_key, $category = 'gallery', $alt_text = '', $
             ]);
         }
         
+        // Langsung ambil data media yang baru saja di-insert/update tanpa filter is_active
+        // karena media yang baru diupload mungkin belum di-set is_active
+        try {
+            $stmt = $conn->prepare("SELECT * FROM media WHERE media_key = ? LIMIT 1");
+            $stmt->execute([$media_key]);
+            $media = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($media) {
+                return $media;
+            }
+        } catch(PDOException $e) {
+            error_log("Error getting uploaded media: " . $e->getMessage());
+        }
+        
+        // Fallback ke getMedia jika query langsung gagal
         return getMedia($media_key);
     } catch(PDOException $e) {
         error_log("Error uploading media: " . $e->getMessage());

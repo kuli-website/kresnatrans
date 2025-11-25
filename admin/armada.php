@@ -8,7 +8,63 @@ requireLogin();
 
 $page_title = 'Kelola Armada Bus';
 $message = '';
-$message_type = ''; 
+$message_type = '';
+
+// Helper function untuk mendapatkan image src untuk armada
+function getArmadaImageSrc($armada_item) {
+    $image_path = $armada_item['image_path'] ?? '';
+    $media_key = $armada_item['media_key'] ?? '';
+    
+    // Prioritas 1: gunakan image_path langsung dari armada table
+    if (!empty($image_path)) {
+        // Normalize path
+        $image_path = ltrim($image_path, '/');
+        
+        // Cek beberapa kemungkinan path
+        $paths_to_check = [
+            '../' . $image_path,  // Relative dari admin folder
+            dirname(__DIR__) . '/' . $image_path,  // Absolute
+            $image_path  // Path asli
+        ];
+        
+        foreach ($paths_to_check as $check_path) {
+            if (file_exists($check_path) && is_file($check_path)) {
+                // Kembalikan relative path untuk display
+                if (strpos($check_path, '../') === 0) {
+                    return $check_path;
+                } else {
+                    // Convert absolute to relative
+                    return '../' . $image_path;
+                }
+            }
+        }
+    }
+    
+    // Prioritas 2: jika tidak ada, coba ambil dari media table via media_key
+    if (!empty($media_key)) {
+        $media = getMediaByKey($media_key);
+        if ($media && !empty($media['file_path'])) {
+            $media_path = ltrim($media['file_path'], '/');
+            $paths_to_check = [
+                '../' . $media_path,
+                dirname(__DIR__) . '/' . $media_path,
+                $media_path
+            ];
+            
+            foreach ($paths_to_check as $check_path) {
+                if (file_exists($check_path) && is_file($check_path)) {
+                    if (strpos($check_path, '../') === 0) {
+                        return $check_path;
+                    } else {
+                        return '../' . $media_path;
+                    }
+                }
+            }
+        }
+    }
+    
+    return null;
+} 
 
 // Handle form actions
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -62,10 +118,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 // Log untuk debugging
                 if (empty($image_path)) {
                     error_log("Warning: Upload berhasil tapi image_path kosong untuk media_key: " . $media_key);
-                    $message = 'Gagal upload gambar! Silakan cek error log atau akses debug_upload.php untuk detail.';
-                    $message_type = 'danger';
+                    // Coba sekali lagi langsung dari database
+                    try {
+                        $stmt = $conn->prepare("SELECT file_path FROM media WHERE media_key = ? LIMIT 1");
+                        $stmt->execute([$media_key]);
+                        $media_check = $stmt->fetch(PDO::FETCH_ASSOC);
+                        if ($media_check && !empty($media_check['file_path'])) {
+                            $image_path = $media_check['file_path'];
+                            error_log("Found image_path from direct query: " . $image_path);
+                        }
+                    } catch(PDOException $e) {
+                        error_log("Error checking media table: " . $e->getMessage());
+                    }
+                    
+                    if (empty($image_path)) {
+                        $message = 'Gagal upload gambar! Silakan cek error log atau akses debug_upload.php untuk detail.';
+                        $message_type = 'danger';
+                    }
                 } else {
-                    error_log("Final image_path: " . $image_path);
+                    error_log("Final image_path to be saved: " . $image_path);
                 }
             } elseif (!empty($media_key)) {
                 // Use existing media (jika tidak ada upload baru)
@@ -104,8 +175,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $slug .= '-' . time();
                 }
                 
+                // Set image_path to NULL if empty (not empty string)
+                $final_image_path = !empty($image_path) ? $image_path : null;
+                error_log("Inserting armada - name: $name, image_path: " . ($final_image_path ?? 'NULL') . ", media_key: " . ($media_key ?: 'NULL'));
+                
                 $stmt = $conn->prepare("INSERT INTO armada (name, capacity, slug, image_path, media_key, features, description, sort_order, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                $stmt->execute([$name, $capacity, $slug, $image_path, $media_key, $features_json, $description, $sort_order, $is_active]);
+                $stmt->execute([$name, $capacity, $slug, $final_image_path, $media_key, $features_json, $description, $sort_order, $is_active]);
+                
+                // Verify the saved data
+                $inserted_id = $conn->lastInsertId();
+                $verify_stmt = $conn->prepare("SELECT image_path, media_key FROM armada WHERE id = ?");
+                $verify_stmt->execute([$inserted_id]);
+                $verify_data = $verify_stmt->fetch(PDO::FETCH_ASSOC);
+                error_log("Verified saved data - image_path: " . ($verify_data['image_path'] ?? 'NULL') . ", media_key: " . ($verify_data['media_key'] ?? 'NULL'));
+                
                 $message = 'Armada berhasil ditambahkan!';
                 $message_type = 'success';
             } else {
@@ -194,27 +277,32 @@ include __DIR__ . '/includes/header.php';
                     <div class="col-md-6 col-lg-4">
                         <div class="card h-100 shadow-sm" style="border: 1px solid #e5e7eb;">
                             <?php 
+                            // Cari image source dengan berbagai fallback
                             $image_src = null;
+                            
+                            // Prioritas 1: gunakan image_path dari armada table
                             if (!empty($armada['image_path'])) {
-                                // Cek file dengan path relatif dari admin folder
-                                $rel_path = '../' . ltrim($armada['image_path'], '/');
-                                $abs_path = __DIR__ . '/../' . ltrim($armada['image_path'], '/');
-                                
-                                if (file_exists($rel_path)) {
-                                    $image_src = $rel_path;
-                                } elseif (file_exists($abs_path)) {
-                                    $image_src = $rel_path; // Tetap gunakan relative untuk display
-                                } elseif (file_exists($armada['image_path'])) {
-                                    $image_src = '../' . ltrim($armada['image_path'], '/');
+                                $path = ltrim($armada['image_path'], '/');
+                                // Pastikan path relatif dari root (uploads/media/...)
+                                // Untuk display dari admin folder, tambahkan ../
+                                if (strpos($path, '../') === 0) {
+                                    // Sudah ada ../, gunakan langsung
+                                    $image_src = $path;
+                                } else {
+                                    // Tambahkan ../ untuk akses dari admin folder
+                                    $image_src = '../' . $path;
                                 }
                             }
-                            // Jika tidak ada image_path tapi ada media_key, coba ambil dari media
-                            if (!$image_src && !empty($armada['media_key'])) {
+                            
+                            // Prioritas 2: jika tidak ada image_path, coba dari media table via media_key
+                            if (empty($image_src) && !empty($armada['media_key'])) {
                                 $media = getMediaByKey($armada['media_key']);
                                 if ($media && !empty($media['file_path'])) {
-                                    $rel_path = '../' . ltrim($media['file_path'], '/');
-                                    if (file_exists($rel_path) || file_exists(__DIR__ . '/../' . ltrim($media['file_path'], '/'))) {
-                                        $image_src = $rel_path;
+                                    $path = ltrim($media['file_path'], '/');
+                                    if (strpos($path, '../') === 0) {
+                                        $image_src = $path;
+                                    } else {
+                                        $image_src = '../' . $path;
                                     }
                                 }
                             }
@@ -223,11 +311,17 @@ include __DIR__ . '/includes/header.php';
                                 <img src="<?php echo htmlspecialchars($image_src); ?>" 
                                      class="card-img-top" 
                                      alt="<?php echo htmlspecialchars($armada['name']); ?>"
-                                     style="height: 200px; object-fit: cover;"
-                                     onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'200\'%3E%3Crect fill=\'%23e5e7eb\' width=\'400\' height=\'200\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' text-anchor=\'middle\' dy=\'.3em\' fill=\'%23999\' font-family=\'sans-serif\' font-size=\'14\'%3EGambar tidak ditemukan%3C/text%3E%3C/svg%3E';">
+                                     style="height: 200px; object-fit: cover; width: 100%;"
+                                     onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'card-img-top bg-light d-flex flex-column align-items-center justify-content-center text-center\' style=\'height: 200px; padding: 10px;\'><i class=\'fas fa-bus fa-3x text-muted mb-2\'></i><small class=\'text-danger\' style=\'font-size: 0.7rem;\'>Gambar tidak ditemukan<br>Path: <?php echo htmlspecialchars($image_src ?? $armada['image_path'] ?? 'N/A'); ?></small></div>';">
                             <?php else: ?>
-                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
-                                    <i class="fas fa-bus fa-3x text-muted"></i>
+                                <div class="card-img-top bg-light d-flex flex-column align-items-center justify-content-center text-center" style="height: 200px; padding: 10px;">
+                                    <i class="fas fa-bus fa-3x text-muted mb-2"></i>
+                                    <small class="text-muted">Tidak ada gambar</small>
+                                    <?php if (!empty($armada['image_path']) || !empty($armada['media_key'])): ?>
+                                        <small class="text-danger mt-1" style="font-size: 0.65rem;">
+                                            Path: <?php echo htmlspecialchars($armada['image_path'] ?? $armada['media_key'] ?? 'N/A'); ?>
+                                        </small>
+                                    <?php endif; ?>
                                 </div>
                             <?php endif; ?>
                             <div class="card-body">
