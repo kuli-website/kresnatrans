@@ -76,31 +76,40 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             error_log("POST data: " . print_r($_POST, true));
             error_log("POST id: " . ($_POST['id'] ?? 'NOT SET'));
             
-            // PENTING: Ambil ID dari POST (bisa kosong untuk create)
-            $id = isset($_POST['id']) && !empty($_POST['id']) ? intval($_POST['id']) : 0;
-            
-            error_log("POST id value: " . var_export($_POST['id'] ?? 'NOT SET', true));
-            error_log("Parsed ID: " . $id);
+            // CRITICAL: Ambil dan validasi ID berdasarkan action
+            error_log("=== ID VALIDATION ===");
             error_log("Action: " . $action);
+            error_log("POST id raw: " . var_export($_POST['id'] ?? 'NOT SET', true));
             
-            // Validasi berdasarkan action
-            if ($action == 'update') {
+            if ($action == 'create') {
+                // CREATE - ID HARUS kosong/sama sekali tidak ada
+                $id = 0;
+                // Pastikan tidak ada ID di POST untuk CREATE
+                if (isset($_POST['id']) && !empty($_POST['id'])) {
+                    error_log("WARNING: CREATE but POST[id] is set: " . $_POST['id'] . ". Forcing to empty.");
+                    unset($_POST['id']); // Hapus ID dari POST
+                }
+                error_log("CREATE mode - ID forced to 0");
+            } elseif ($action == 'update') {
+                // UPDATE - ID HARUS ada dan valid
+                $id = isset($_POST['id']) ? trim($_POST['id']) : '';
+                $id = !empty($id) && is_numeric($id) ? intval($id) : 0;
+                
                 if (empty($id) || $id <= 0) {
+                    error_log("ERROR: UPDATE but no valid ID");
                     $message = 'Error: ID tidak valid untuk update. Pastikan ID terkirim dari form.';
                     $message_type = 'danger';
-                    error_log("ERROR: Update but no valid ID");
                     // Stop execution untuk update tanpa ID
                     $action = ''; // Prevent further processing
+                } else {
+                    error_log("UPDATE mode - ID: " . $id);
                 }
-            } elseif ($action == 'create') {
-                // CREATE - pastikan ID kosong atau 0
-                if (!empty($id) && $id > 0) {
-                    error_log("WARNING: Create action but ID is set: " . $id . ". Ignoring ID.");
-                    $id = 0; // Force ID to 0 for create
-                }
+            } else {
+                // Unknown action
+                $id = 0;
             }
             
-            error_log("Final ID to use after validation: " . $id);
+            error_log("Final ID after validation: " . $id);
             
             $name = trim($_POST['name'] ?? '');
             $capacity = trim($_POST['capacity'] ?? '');
@@ -138,34 +147,47 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $slug = preg_replace('/[^a-z0-9-]/', '', $slug);
             
             if ($action == 'create') {
-                // CREATE - Pastikan tidak ada ID
-                if (!empty($_POST['id'])) {
-                    // Jika ada ID, ini seharusnya update, bukan create
-                    $message = 'Error: Form dalam mode create tidak boleh memiliki ID.';
-                    $message_type = 'danger';
-                } else {
-                    // Check if slug exists
-                    $checkSlug = $conn->prepare("SELECT id FROM armada WHERE slug = ?");
-                    $checkSlug->execute([$slug]);
-                    if ($checkSlug->rowCount() > 0) {
-                        $slug .= '-' . time();
-                    }
+                // CREATE - CRITICAL: Pastikan tidak ada ID sama sekali
+                // Force ID to 0 untuk CREATE, tidak peduli apa yang dikirim
+                $id = 0;
+                unset($_POST['id']); // Hapus ID dari POST untuk memastikan
+                
+                error_log("=== CREATE ARMADA ===");
+                error_log("POST id (should be empty): " . var_export($_POST['id'] ?? 'NOT SET', true));
+                error_log("Forced ID to 0 for CREATE");
+                
+                // Check if slug exists
+                $checkSlug = $conn->prepare("SELECT id FROM armada WHERE slug = ?");
+                $checkSlug->execute([$slug]);
+                if ($checkSlug->rowCount() > 0) {
+                    $slug .= '-' . time();
+                }
+                
+                // INSERT - Pastikan ini benar-benar INSERT, bukan UPDATE
+                try {
+                    $insert_sql = "INSERT INTO armada (name, capacity, slug, image_path, features, description, sort_order, is_active) VALUES (?, ?, ?, ?, ?, ?, 0, ?)";
+                    $insert_params = [$name, $capacity, $slug, $image_path, $features_json, $description, $is_active];
                     
-                    // Insert - sederhana: hanya kolom penting
-                    try {
-                        $stmt = $conn->prepare("INSERT INTO armada (name, capacity, slug, image_path, features, description, sort_order, is_active) VALUES (?, ?, ?, ?, ?, ?, 0, ?)");
-                        $stmt->execute([$name, $capacity, $slug, $image_path, $features_json, $description, $is_active]);
-                        
-                        $message = !empty($image_path) ? 'Armada berhasil ditambahkan!' : 'Armada berhasil ditambahkan! (Belum ada gambar)';
-                        $message_type = 'success';
-                        
-                        // Redirect untuk refresh dan reset form
-                        header("Location: armada.php?success=1");
-                        exit;
-                    } catch(PDOException $e) {
-                        $message = 'Error: Gagal menyimpan data armada. ' . $e->getMessage();
-                        $message_type = 'danger';
-                    }
+                    error_log("INSERT SQL: " . $insert_sql);
+                    error_log("INSERT Params: " . print_r($insert_params, true));
+                    error_log("INSERT Params count: " . count($insert_params));
+                    
+                    $stmt = $conn->prepare($insert_sql);
+                    $result = $stmt->execute($insert_params);
+                    
+                    $new_id = $conn->lastInsertId();
+                    error_log("INSERT successful - New ID: " . $new_id);
+                    
+                    $message = !empty($image_path) ? 'Armada berhasil ditambahkan!' : 'Armada berhasil ditambahkan! (Belum ada gambar)';
+                    $message_type = 'success';
+                    
+                    // Redirect untuk refresh dan reset form
+                    header("Location: armada.php?success=1");
+                    exit;
+                } catch(PDOException $e) {
+                    error_log("INSERT ERROR: " . $e->getMessage());
+                    $message = 'Error: Gagal menyimpan data armada. ' . $e->getMessage();
+                    $message_type = 'danger';
                 }
             } elseif ($action == 'update') {
                 // UPDATE - CRITICAL: Hanya update jika action benar-benar 'update' dan ID valid
@@ -333,7 +355,25 @@ include __DIR__ . '/includes/header.php';
             </div>
         <?php else: ?>
             <div class="row g-4">
-                <?php foreach ($armada_list as $armada): ?>
+                <?php foreach ($armada_list as $index => $armada): ?>
+                    <?php if ($index === 0): ?>
+                        <!-- Debug info - hanya untuk troubleshooting -->
+                        <div class="col-12 mb-3">
+                            <details class="alert alert-info">
+                                <summary style="cursor: pointer;">🔍 Debug Info (Klik untuk melihat)</summary>
+                                <pre style="margin-top: 10px; font-size: 11px;"><?php 
+                                    echo "Total armada: " . count($armada_list) . "\n";
+                                    echo "Action dari POST: " . ($_POST['action'] ?? 'NONE') . "\n";
+                                    echo "ID dari POST: " . ($_POST['id'] ?? 'NONE') . "\n";
+                                    echo "GET edit: " . ($_GET['edit'] ?? 'NONE') . "\n\n";
+                                    echo "Armada data:\n";
+                                    foreach ($armada_list as $idx => $a) {
+                                        echo "  [$idx] ID: {$a['id']}, Name: {$a['name']}, Image: " . ($a['image_path'] ?? 'NULL') . "\n";
+                                    }
+                                ?></pre>
+                            </details>
+                        </div>
+                    <?php endif; ?>
                     <div class="col-md-6 col-lg-4">
                         <div class="card h-100 shadow-sm" style="border: 1px solid #e5e7eb;">
                             <?php 
