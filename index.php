@@ -689,6 +689,16 @@
         </div>
     </footer>
 
+    <!-- Floating WhatsApp Button -->
+    <a href="https://wa.me/6282371869118?text=Halo%20kak%2C%20saya%20mau%20tanya%20tanya%20tentang%20sewa%20bus%20nya" 
+       target="_blank" 
+       class="whatsapp-float" 
+       aria-label="Chat via WhatsApp"
+       title="Chat via WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+        <span class="whatsapp-tooltip">Chat WhatsApp</span>
+    </a>
+
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
