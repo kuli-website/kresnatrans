@@ -381,7 +381,7 @@ include __DIR__ . '/includes/header.php';
                                     </div>
                                 <?php endif; ?>
                                 <div class="btn-group w-100">
-                                    <a href="?edit=<?php echo $armada['id']; ?>" class="btn btn-sm btn-outline-primary">
+                                    <a href="?edit=<?php echo $armada['id']; ?>" class="btn btn-sm btn-outline-primary" data-edit-id="<?php echo $armada['id']; ?>">
                                         <i class="fas fa-edit"></i> Edit
                                     </a>
                                     <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDelete(<?php echo $armada['id']; ?>, '<?php echo htmlspecialchars($armada['name'], ENT_QUOTES); ?>')">
@@ -407,7 +407,7 @@ include __DIR__ . '/includes/header.php';
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form method="POST" enctype="multipart/form-data" id="armadaForm">
+            <form method="POST" enctype="multipart/form-data" id="armadaForm" onsubmit="return validateForm(event)">
                 <input type="hidden" name="action" id="formAction" value="<?php echo $edit_data ? 'update' : 'create'; ?>">
                 <input type="hidden" name="id" id="formId" value="<?php echo $edit_data ? intval($edit_data['id']) : ''; ?>">
                 
@@ -516,18 +516,19 @@ include __DIR__ . '/includes/header.php';
             modal.addEventListener('show.bs.modal', function(event) {
                 // Jika modal dibuka dari button "Tambah Armada" (bukan dari edit)
                 const button = event.relatedTarget;
-                if (!button || !button.getAttribute('data-edit-id')) {
+                // Cek apakah ini button tambah baru atau link edit
+                const isEditLink = window.location.search.includes('edit=');
+                if (!isEditLink && (!button || !button.getAttribute('data-edit-id'))) {
+                    // Hanya reset jika benar-benar tambah baru
                     resetForm();
                 }
             });
             
-            modal.addEventListener('hidden.bs.modal', function() {
-                // Reset form saat modal ditutup
-                resetForm();
-            });
+            // JANGAN reset form saat modal ditutup karena bisa mengganggu edit
+            // Form akan di-reset saat redirect setelah submit
         }
         
-        // Auto-show modal jika ada edit_data
+        // Auto-show modal jika ada edit_data (dari URL parameter edit=)
         <?php if ($edit_data): ?>
         try {
             if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
@@ -545,6 +546,33 @@ include __DIR__ . '/includes/header.php';
 </script>
 
 <script>
+function validateForm(event) {
+    const action = document.getElementById('formAction')?.value;
+    const id = document.getElementById('formId')?.value;
+    
+    console.log('Form submit - Action:', action, 'ID:', id);
+    
+    // Jika update, pastikan ID ada
+    if (action === 'update') {
+        if (!id || id === '' || id === '0') {
+            alert('Error: ID tidak ditemukan. Silakan refresh halaman dan coba lagi.');
+            event.preventDefault();
+            return false;
+        }
+    }
+    
+    // Jika create, pastikan ID kosong
+    if (action === 'create') {
+        if (id && id !== '' && id !== '0') {
+            console.warn('Warning: Create action but ID is set:', id);
+            // Clear ID untuk create
+            document.getElementById('formId').value = '';
+        }
+    }
+    
+    return true;
+}
+
 function resetForm() {
     try {
         const form = document.getElementById('armadaForm');
@@ -562,6 +590,7 @@ function resetForm() {
             const idInput = document.getElementById('formId');
             if (idInput) {
                 idInput.value = '';
+                idInput.removeAttribute('value'); // Pastikan benar-benar kosong
             }
             
             // Reset semua text inputs ke empty
@@ -601,6 +630,9 @@ function resetForm() {
             if (modalTitle) {
                 modalTitle.textContent = 'Tambah Armada Baru';
             }
+            
+            // Log untuk debug
+            console.log('Form reset - ID cleared:', document.getElementById('formId')?.value);
         }
     } catch (e) {
         console.error('Error resetting form:', e);
