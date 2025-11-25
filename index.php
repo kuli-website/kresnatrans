@@ -192,7 +192,9 @@
                         </div>
                     </div>
                     <div class="hero-buttons mt-4">
-                        <a href="#contact" class="btn btn-primary btn-lg me-3">
+                        <a href="https://wa.me/6282371869118?text=Halo%20kak%2C%20saya%20mau%20tanya%20tanya%20tentang%20sewa%20bus%20nya" 
+                           target="_blank" 
+                           class="btn btn-whatsapp btn-lg me-3">
                             <i class="fab fa-whatsapp me-2"></i>Hubungi via WhatsApp
                         </a>
                         <a href="#armada" class="btn btn-outline-light btn-lg">

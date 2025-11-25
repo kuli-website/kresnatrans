@@ -445,6 +445,27 @@ position: absolute;
     box-shadow: var(--shadow-lg);
 }
 
+.btn-whatsapp {
+    background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+}
+
+.btn-whatsapp:hover {
+    background: linear-gradient(135deg, #128C7E 0%, #075E54 100%);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+}
+
+.btn-whatsapp:active,
+.btn-whatsapp:focus {
+    background: linear-gradient(135deg, #128C7E 0%, #075E54 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+}
+
 .btn-outline-primary {
     border: 2px solid var(--primary-color);
     color: var(--primary-color);
