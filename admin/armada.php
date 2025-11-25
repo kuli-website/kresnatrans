@@ -167,81 +167,78 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         $message_type = 'danger';
                     }
                 }
-            } else {
-                // UPDATE - Pastikan ada ID yang valid
-                if (empty($id) || $id <= 0) {
-                    $message = 'Error: ID tidak valid untuk update.';
+            } elseif ($action == 'update') {
+                // UPDATE - CRITICAL: Hanya update jika action benar-benar 'update' dan ID valid
+                if (empty($id) || $id <= 0 || !is_numeric($id)) {
+                    error_log("FATAL: UPDATE attempted without valid ID. ID = " . var_export($id, true));
+                    error_log("POST id: " . var_export($_POST['id'] ?? 'NOT SET', true));
+                    $message = 'Error: ID tidak valid untuk update. Tidak dapat melanjutkan.';
                     $message_type = 'danger';
                 } else {
+                    // Convert ID ke integer untuk memastikan
+                    $id = intval($id);
+                    
                     try {
-                        // Verifikasi ID ada di database
-                        $checkId = $conn->prepare("SELECT id FROM armada WHERE id = ?");
+                        // Verifikasi ID ada di database - hanya 1 record yang harus ditemukan
+                        $checkId = $conn->prepare("SELECT id FROM armada WHERE id = ? LIMIT 1");
                         $checkId->execute([$id]);
-                        if ($checkId->rowCount() == 0) {
-                            $message = 'Error: Armada dengan ID tersebut tidak ditemukan.';
+                        $existing_record = $checkId->fetch(PDO::FETCH_ASSOC);
+                        
+                        if (!$existing_record || $existing_record['id'] != $id) {
+                            error_log("ERROR: Record with ID $id not found in database");
+                            $message = 'Error: Armada dengan ID ' . $id . ' tidak ditemukan.';
                             $message_type = 'danger';
                         } else {
-                            // Update dengan WHERE id yang eksplisit - PASTIKAN ID DI AKHIR PARAMETER
-                            error_log("Updating armada with ID: " . $id);
-                            error_log("Update data - name: $name, capacity: $capacity, slug: $slug");
+                            // ID valid dan ada - lanjutkan update HANYA untuk ID ini
+                            error_log("=== UPDATE ARMADA ===");
+                            error_log("Target ID: " . $id);
+                            error_log("Name: $name");
+                            error_log("Capacity: $capacity");
                             error_log("Image path: " . ($image_path ?? 'NULL'));
                             
-                            // DOUBLE CHECK: Pastikan ID benar-benar valid sebelum update
-                            if (empty($id) || $id <= 0 || !is_numeric($id)) {
-                                error_log("FATAL ERROR: ID is invalid before update. ID = " . var_export($id, true));
-                                $message = 'Error: ID tidak valid untuk update. ID yang diterima: ' . var_export($id, true);
+                            // Build UPDATE query - PASTIKAN ID DI AKHIR
+                            $id_param = intval($id); // Pastikan integer
+                            
+                            if (!empty($image_path)) {
+                                $update_sql = "UPDATE armada SET name = ?, capacity = ?, slug = ?, image_path = ?, features = ?, description = ?, is_active = ? WHERE id = ?";
+                                $update_params = [$name, $capacity, $slug, $image_path, $features_json, $description, $is_active, $id_param];
+                            } else {
+                                // Tidak update image_path - ambil dari database
+                                $update_sql = "UPDATE armada SET name = ?, capacity = ?, slug = ?, features = ?, description = ?, is_active = ? WHERE id = ?";
+                                $update_params = [$name, $capacity, $slug, $features_json, $description, $is_active, $id_param];
+                            }
+                            
+                            error_log("SQL: " . $update_sql);
+                            error_log("Params: " . print_r($update_params, true));
+                            error_log("ID param (last): " . end($update_params));
+                            
+                            // Final check: Pastikan ID di params valid
+                            if (end($update_params) != $id || end($update_params) <= 0) {
+                                error_log("FATAL: ID mismatch! Expected: $id, Got: " . end($update_params));
+                                $message = 'Error: ID tidak sesuai.';
                                 $message_type = 'danger';
                             } else {
-                                // Build UPDATE query dengan parameter binding yang eksplisit
-                                // PASTIKAN: ID selalu di akhir parameter array
-                                if (!empty($image_path)) {
-                                    $update_sql = "UPDATE armada SET name = ?, capacity = ?, slug = ?, image_path = ?, features = ?, description = ?, is_active = ? WHERE id = ?";
-                                    $params = [$name, $capacity, $slug, $image_path, $features_json, $description, $is_active, intval($id)];
-                                } else {
-                                    // Tidak update image_path jika kosong (pertahankan yang lama)
-                                    $update_sql = "UPDATE armada SET name = ?, capacity = ?, slug = ?, features = ?, description = ?, is_active = ? WHERE id = ?";
-                                    $params = [$name, $capacity, $slug, $features_json, $description, $is_active, intval($id)];
-                                }
-                                
-                                error_log("UPDATE SQL: " . $update_sql);
-                                error_log("UPDATE Params count: " . count($params));
-                                error_log("UPDATE Params: " . print_r($params, true));
-                                error_log("UPDATE ID (last param): " . $params[count($params) - 1]);
-                                
-                                // Verifikasi ID di params
-                                $last_param = $params[count($params) - 1];
-                                if (empty($last_param) || $last_param <= 0) {
-                                    error_log("FATAL ERROR: ID in params is invalid! Last param = " . var_export($last_param, true));
-                                    $message = 'Error: ID dalam parameter tidak valid.';
-                                    $message_type = 'danger';
-                                } else {
-                                    $stmt = $conn->prepare($update_sql);
-                                    $result = $stmt->execute($params);
+                                // Execute UPDATE
+                                $stmt = $conn->prepare($update_sql);
+                                $stmt->execute($update_params);
                                 
                                 $rows_affected = $stmt->rowCount();
-                                error_log("UPDATE result - Rows affected: " . $rows_affected);
+                                error_log("Rows affected: " . $rows_affected);
                                 
-                                // Verifikasi hanya 1 row yang ter-update
                                 if ($rows_affected > 1) {
-                                    error_log("ERROR: Multiple rows updated! This should not happen. Rows affected: " . $rows_affected);
-                                    // Rollback atau alert
+                                    error_log("CRITICAL ERROR: " . $rows_affected . " rows updated instead of 1!");
                                     $message = 'Error: Lebih dari 1 record ter-update! Silakan hubungi administrator.';
                                     $message_type = 'danger';
-                                } elseif ($rows_affected == 0) {
-                                    error_log("WARNING: No rows updated! ID might be wrong or data is the same.");
-                                    $message = 'Tidak ada perubahan yang disimpan.';
-                                    $message_type = 'warning';
                                 } else {
                                     $message = 'Armada berhasil diupdate!';
                                     $message_type = 'success';
+                                    header("Location: armada.php?success=1");
+                                    exit;
                                 }
-                                
-                                // Redirect untuk refresh dan reset form
-                                header("Location: armada.php?success=1");
-                                exit;
                             }
                         }
                     } catch(PDOException $e) {
+                        error_log("UPDATE ERROR: " . $e->getMessage());
                         $message = 'Error: Gagal mengupdate data armada. ' . $e->getMessage();
                         $message_type = 'danger';
                     }
