@@ -516,41 +516,92 @@ include __DIR__ . '/includes/header.php';
 <?php if ($edit_data): ?>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const modal = new bootstrap.Modal(document.getElementById('armadaModal'));
-        modal.show();
+        try {
+            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                const modalElement = document.getElementById('armadaModal');
+                if (modalElement) {
+                    const modal = new bootstrap.Modal(modalElement);
+                    modal.show();
+                }
+            }
+        } catch (e) {
+            console.error('Error showing modal:', e);
+        }
     });
 </script>
 <?php endif; ?>
 
 <script>
 function resetForm() {
-    document.getElementById('armadaForm').reset();
-    document.querySelector('input[name="action"]').value = 'create';
-    const featuresContainer = document.getElementById('featuresContainer');
-    featuresContainer.innerHTML = '<div class="input-group mb-2 feature-item"><input type="text" name="features[]" class="form-control" placeholder="Contoh: AC Dingin"><button type="button" class="btn btn-outline-danger" onclick="removeFeature(this)"><i class="fas fa-times"></i></button></div>';
+    try {
+        const form = document.getElementById('armadaForm');
+        if (form) {
+            form.reset();
+        }
+        const actionInput = document.querySelector('input[name="action"]');
+        if (actionInput) {
+            actionInput.value = 'create';
+        }
+        const featuresContainer = document.getElementById('featuresContainer');
+        if (featuresContainer) {
+            featuresContainer.innerHTML = '<div class="input-group mb-2 feature-item"><input type="text" name="features[]" class="form-control" placeholder="Contoh: AC Dingin"><button type="button" class="btn btn-outline-danger" onclick="removeFeature(this)"><i class="fas fa-times"></i></button></div>';
+        }
+    } catch (e) {
+        console.error('Error resetting form:', e);
+    }
 }
 
 function addFeature() {
-    const container = document.getElementById('featuresContainer');
-    const newFeature = document.createElement('div');
-    newFeature.className = 'input-group mb-2 feature-item';
-    newFeature.innerHTML = '<input type="text" name="features[]" class="form-control" placeholder="Contoh: AC Dingin"><button type="button" class="btn btn-outline-danger" onclick="removeFeature(this)"><i class="fas fa-times"></i></button>';
-    container.appendChild(newFeature);
+    try {
+        const container = document.getElementById('featuresContainer');
+        if (container) {
+            const newFeature = document.createElement('div');
+            newFeature.className = 'input-group mb-2 feature-item';
+            newFeature.innerHTML = '<input type="text" name="features[]" class="form-control" placeholder="Contoh: AC Dingin"><button type="button" class="btn btn-outline-danger" onclick="removeFeature(this)"><i class="fas fa-times"></i></button>';
+            container.appendChild(newFeature);
+        }
+    } catch (e) {
+        console.error('Error adding feature:', e);
+    }
 }
 
 function removeFeature(btn) {
-    const featureItems = document.querySelectorAll('.feature-item');
-    if (featureItems.length > 1) {
-        btn.closest('.feature-item').remove();
-    } else {
-        btn.closest('.feature-item').querySelector('input').value = '';
+    try {
+        const featureItems = document.querySelectorAll('.feature-item');
+        if (featureItems.length > 1) {
+            const featureItem = btn.closest('.feature-item');
+            if (featureItem) {
+                featureItem.remove();
+            }
+        } else {
+            const featureItem = btn.closest('.feature-item');
+            if (featureItem) {
+                const input = featureItem.querySelector('input');
+                if (input) {
+                    input.value = '';
+                }
+            }
+        }
+    } catch (e) {
+        console.error('Error removing feature:', e);
     }
 }
 
 function confirmDelete(id, name) {
-    if (confirm('Apakah Anda yakin ingin menghapus armada "' + name + '"? Tindakan ini tidak dapat dibatalkan.')) {
-        document.getElementById('deleteId').value = id;
-        document.getElementById('deleteForm').submit();
+    try {
+        if (confirm('Apakah Anda yakin ingin menghapus armada "' + name + '"? Tindakan ini tidak dapat dibatalkan.')) {
+            const deleteIdInput = document.getElementById('deleteId');
+            if (deleteIdInput) {
+                deleteIdInput.value = id;
+            }
+            const deleteForm = document.getElementById('deleteForm');
+            if (deleteForm) {
+                deleteForm.submit();
+            }
+        }
+    } catch (e) {
+        console.error('Error deleting armada:', e);
+        alert('Terjadi kesalahan saat menghapus armada. Silakan coba lagi.');
     }
 }
 </script>
