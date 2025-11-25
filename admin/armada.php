@@ -2,7 +2,6 @@
 session_start();
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/includes/auth_helper.php';
-require_once __DIR__ . '/../includes/media_helper.php';
 
 requireLogin();
 
@@ -10,61 +9,60 @@ $page_title = 'Kelola Armada Bus';
 $message = '';
 $message_type = '';
 
-// Helper function untuk mendapatkan image src untuk armada
-function getArmadaImageSrc($armada_item) {
-    $image_path = $armada_item['image_path'] ?? '';
-    $media_key = $armada_item['media_key'] ?? '';
-    
-    // Prioritas 1: gunakan image_path langsung dari armada table
-    if (!empty($image_path)) {
-        // Normalize path
-        $image_path = ltrim($image_path, '/');
-        
-        // Cek beberapa kemungkinan path
-        $paths_to_check = [
-            '../' . $image_path,  // Relative dari admin folder
-            dirname(__DIR__) . '/' . $image_path,  // Absolute
-            $image_path  // Path asli
-        ];
-        
-        foreach ($paths_to_check as $check_path) {
-            if (file_exists($check_path) && is_file($check_path)) {
-                // Kembalikan relative path untuk display
-                if (strpos($check_path, '../') === 0) {
-                    return $check_path;
-                } else {
-                    // Convert absolute to relative
-                    return '../' . $image_path;
-                }
-            }
-        }
+// Helper function sederhana untuk mendapatkan image src
+function getArmadaImageSrc($image_path) {
+    if (empty($image_path)) {
+        return null;
     }
     
-    // Prioritas 2: jika tidak ada, coba ambil dari media table via media_key
-    if (!empty($media_key)) {
-        $media = getMediaByKey($media_key);
-        if ($media && !empty($media['file_path'])) {
-            $media_path = ltrim($media['file_path'], '/');
-            $paths_to_check = [
-                '../' . $media_path,
-                dirname(__DIR__) . '/' . $media_path,
-                $media_path
-            ];
-            
-            foreach ($paths_to_check as $check_path) {
-                if (file_exists($check_path) && is_file($check_path)) {
-                    if (strpos($check_path, '../') === 0) {
-                        return $check_path;
-                    } else {
-                        return '../' . $media_path;
-                    }
-                }
-            }
-        }
+    // Normalize path
+    $image_path = ltrim($image_path, '/');
+    
+    // Return relative path untuk display dari admin folder
+    return '../' . $image_path;
+} 
+
+// Fungsi sederhana untuk upload gambar langsung ke folder
+function uploadArmadaImage($file) {
+    // Tentukan folder upload (absolute path)
+    $root_dir = dirname(__DIR__);
+    $upload_dir = $root_dir . '/uploads/media/';
+    
+    // Buat folder jika belum ada
+    if (!is_dir($upload_dir)) {
+        @mkdir($upload_dir, 0777, true);
+    }
+    
+    // Cek error upload
+    if (!isset($file['error']) || $file['error'] !== UPLOAD_ERR_OK) {
+        return null;
+    }
+    
+    // Validasi tipe file
+    $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+    $file_extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+    
+    if (!in_array($file_extension, $allowed_extensions)) {
+        return null;
+    }
+    
+    // Validasi ukuran (max 5MB)
+    if ($file['size'] > 5242880) {
+        return null;
+    }
+    
+    // Generate nama file unik
+    $file_name = 'armada_' . time() . '_' . uniqid() . '.' . $file_extension;
+    $file_path = $upload_dir . $file_name;
+    
+    // Pindahkan file
+    if (move_uploaded_file($file['tmp_name'], $file_path)) {
+        // Return relative path untuk disimpan di database
+        return 'uploads/media/' . $file_name;
     }
     
     return null;
-} 
+}
 
 // Handle form actions
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -75,144 +73,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $id = intval($_POST['id'] ?? 0);
             $name = trim($_POST['name'] ?? '');
             $capacity = trim($_POST['capacity'] ?? '');
-            $slug = trim($_POST['slug'] ?? '');
             $description = trim($_POST['description'] ?? '');
             $features = $_POST['features'] ?? [];
             $features_json = json_encode(array_filter(array_map('trim', $features)));
-            $sort_order = intval($_POST['sort_order'] ?? 0);
             $is_active = isset($_POST['is_active']) ? 1 : 0;
-            $media_key = trim($_POST['media_key'] ?? '');
             
-            // Handle image upload
-            $image_path = null;
-            
-            // Debug: Log semua file upload info
-            error_log("=== ARMADA UPLOAD DEBUG ===");
-            error_log("POST data: " . print_r($_POST, true));
-            error_log("FILES data: " . print_r($_FILES, true));
-            error_log("Image file exists: " . (isset($_FILES['image']) ? 'YES' : 'NO'));
-            
-            if (isset($_FILES['image'])) {
-                error_log("Image file error code: " . $_FILES['image']['error']);
-                error_log("Image file name: " . ($_FILES['image']['name'] ?? 'N/A'));
-                error_log("Image file size: " . ($_FILES['image']['size'] ?? 'N/A'));
-                error_log("Image tmp_name: " . ($_FILES['image']['tmp_name'] ?? 'N/A'));
-                
-                // Cek error upload
-                $upload_errors = [
-                    UPLOAD_ERR_OK => 'No error',
-                    UPLOAD_ERR_INI_SIZE => 'File exceeds upload_max_filesize',
-                    UPLOAD_ERR_FORM_SIZE => 'File exceeds MAX_FILE_SIZE',
-                    UPLOAD_ERR_PARTIAL => 'File uploaded partially',
-                    UPLOAD_ERR_NO_FILE => 'No file uploaded',
-                    UPLOAD_ERR_NO_TMP_DIR => 'Missing temporary folder',
-                    UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk',
-                    UPLOAD_ERR_EXTENSION => 'PHP extension stopped the upload'
-                ];
-                
-                if ($_FILES['image']['error'] === UPLOAD_ERR_OK) {
-                    if (empty($media_key)) {
-                        $media_key = 'armada_' . strtolower(str_replace(' ', '_', preg_replace('/[^a-zA-Z0-9\s]/', '', $name))) . '_' . time();
-                    }
-                    
-                    // Debug log sebelum upload
-                    error_log("Starting upload - File: " . $_FILES['image']['name'] . ", Size: " . $_FILES['image']['size'] . ", Error: " . $_FILES['image']['error']);
-                    error_log("Media key: " . $media_key);
-                    error_log("Admin ID: " . ($_SESSION['admin_id'] ?? 'NULL'));
-                    
-                    // Pastikan file benar-benar ada
-                    if (!file_exists($_FILES['image']['tmp_name'])) {
-                        error_log("ERROR: Temporary file does not exist: " . $_FILES['image']['tmp_name']);
-                        $message = 'File upload gagal: File temporary tidak ditemukan.';
-                        $message_type = 'danger';
-                    } else {
-                        $result = uploadMedia($_FILES['image'], $media_key, 'armada', $name . ' - ' . $capacity, $name, $_SESSION['admin_id'] ?? null);
-                        
-                        // Debug log setelah upload
-                        error_log("Upload result type: " . gettype($result));
-                        error_log("Upload result: " . ($result ? 'SUCCESS' : 'FAILED'));
-                        if ($result) {
-                            error_log("Upload result data: " . print_r($result, true));
-                        } else {
-                            error_log("Upload FAILED - checking error log for details");
-                        }
-                        
-                        if ($result && is_array($result) && !empty($result['file_path'])) {
-                            // Gunakan file_path dari result uploadMedia
-                            $image_path = $result['file_path'];
-                            error_log("Using file_path from result: " . $image_path);
-                        } else {
-                            // Fallback: coba ambil dari getMediaByKey (tanpa filter is_active)
-                            try {
-                                $stmt = $conn->prepare("SELECT file_path FROM media WHERE media_key = ? LIMIT 1");
-                                $stmt->execute([$media_key]);
-                                $media_check = $stmt->fetch(PDO::FETCH_ASSOC);
-                                if ($media_check && !empty($media_check['file_path'])) {
-                                    $image_path = $media_check['file_path'];
-                                    error_log("Found image_path from direct query: " . $image_path);
-                                }
-                            } catch(PDOException $e) {
-                                error_log("Error checking media table: " . $e->getMessage());
-                            }
-                            
-                            // Jika masih kosong, coba getMediaByKey
-                            if (empty($image_path)) {
-                                $media = getMediaByKey($media_key);
-                                if ($media && !empty($media['file_path'])) {
-                                    $image_path = $media['file_path'];
-                                    error_log("Using file_path from getMediaByKey: " . $image_path);
-                                }
-                            }
-                        }
-                        
-                        // Log untuk debugging
-                        if (empty($image_path)) {
-                            error_log("WARNING: Upload berhasil tapi image_path kosong untuk media_key: " . $media_key);
-                            
-                            // Cek apakah file benar-benar ter-upload
-                            $root_dir = dirname(__DIR__);
-                            $possible_paths = [
-                                $root_dir . '/uploads/media/' . basename($_FILES['image']['name']),
-                                'uploads/media/' . basename($_FILES['image']['name']),
-                            ];
-                            
-                            foreach ($possible_paths as $check_path) {
-                                if (file_exists($check_path)) {
-                                    error_log("Found uploaded file at: " . $check_path);
-                                    $image_path = str_replace($root_dir . '/', '', $check_path);
-                                    $image_path = ltrim($image_path, '/');
-                                    if (strpos($image_path, 'uploads/media/') !== 0) {
-                                        $image_path = 'uploads/media/' . basename($image_path);
-                                    }
-                                    break;
-                                }
-                            }
-                            
-                            if (empty($image_path)) {
-                                $message = 'Gagal upload gambar! Upload mungkin berhasil tapi path tidak tersimpan. Silakan cek error log atau coba upload ulang.';
-                                $message_type = 'danger';
-                            }
-                        } else {
-                            error_log("Final image_path to be saved: " . $image_path);
-                        }
-                    }
-                } else {
-                    $error_msg = $upload_errors[$_FILES['image']['error']] ?? 'Unknown error (' . $_FILES['image']['error'] . ')';
-                    error_log("Upload error: " . $error_msg);
-                    $message = 'Error upload file: ' . $error_msg;
+            // Handle image upload - SIMPLE: langsung ke folder
+            if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+                $image_path = uploadArmadaImage($_FILES['image']);
+                if (!$image_path) {
+                    $message = 'Gagal upload gambar! Pastikan file adalah gambar valid (JPG, PNG, GIF, WebP) dan ukuran maksimal 5MB.';
                     $message_type = 'danger';
                 }
-            } elseif (!empty($media_key)) {
-                // Use existing media (jika tidak ada upload baru)
-                $media = getMediaByKey($media_key);
-                if ($media && !empty($media['file_path'])) {
-                    $image_path = $media['file_path'];
-                }
-            }
-            
-            // Jika edit dan tidak ada upload baru, pertahankan image_path yang ada
-            if ($action == 'update' && empty($image_path) && !empty($_POST['id'])) {
-                $id = intval($_POST['id']);
+            } elseif ($action == 'update' && !empty($_POST['id'])) {
+                // Jika edit dan tidak ada upload baru, pertahankan image_path yang ada
                 try {
                     $stmt = $conn->prepare("SELECT image_path FROM armada WHERE id = ?");
                     $stmt->execute([$id]);
@@ -221,20 +95,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         $image_path = $existing['image_path'];
                     }
                 } catch(PDOException $e) {
-                    error_log("Error getting existing image_path: " . $e->getMessage());
+                    // Ignore error
                 }
             }
             
             // Jika ada error message dan upload penting, jangan lanjutkan
             // (Untuk create, upload tidak wajib, tapi untuk update kita tetap lanjut)
             
+            // Generate slug otomatis (untuk kompatibilitas database)
+            $slug = strtolower(str_replace(' ', '-', $name)) . '-' . strtolower(str_replace(' ', '-', $capacity));
+            $slug = preg_replace('/[^a-z0-9-]/', '', $slug);
+            
             if ($action == 'create') {
-                // Create slug if empty
-                if (empty($slug)) {
-                    $slug = strtolower(str_replace(' ', '-', $name)) . '-' . strtolower(str_replace(' ', '-', $capacity));
-                    $slug = preg_replace('/[^a-z0-9-]/', '', $slug);
-                }
-                
                 // Check if slug exists
                 $checkSlug = $conn->prepare("SELECT id FROM armada WHERE slug = ?");
                 $checkSlug->execute([$slug]);
@@ -242,66 +114,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $slug .= '-' . time();
                 }
                 
-                // Set image_path to NULL if empty (not empty string)
-                $final_image_path = !empty($image_path) ? $image_path : null;
-                error_log("Inserting armada - name: $name, image_path: " . ($final_image_path ?? 'NULL') . ", media_key: " . ($media_key ?: 'NULL'));
-                
+                // Insert - sederhana: hanya kolom penting
                 try {
-                    $stmt = $conn->prepare("INSERT INTO armada (name, capacity, slug, image_path, media_key, features, description, sort_order, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                    $stmt->execute([$name, $capacity, $slug, $final_image_path, $media_key, $features_json, $description, $sort_order, $is_active]);
+                    $stmt = $conn->prepare("INSERT INTO armada (name, capacity, slug, image_path, features, description, sort_order, is_active) VALUES (?, ?, ?, ?, ?, ?, 0, ?)");
+                    $stmt->execute([$name, $capacity, $slug, $image_path, $features_json, $description, $is_active]);
                     
-                    // Verify the saved data
-                    $inserted_id = $conn->lastInsertId();
-                    $verify_stmt = $conn->prepare("SELECT image_path, media_key FROM armada WHERE id = ?");
-                    $verify_stmt->execute([$inserted_id]);
-                    $verify_data = $verify_stmt->fetch(PDO::FETCH_ASSOC);
-                    error_log("Verified saved data - image_path: " . ($verify_data['image_path'] ?? 'NULL') . ", media_key: " . ($verify_data['media_key'] ?? 'NULL'));
-                    
-                    // Jika upload file tapi image_path kosong, tambahkan warning
-                    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK && empty($final_image_path)) {
-                        $message = 'Armada berhasil ditambahkan, tapi gambar tidak tersimpan. Silakan edit dan upload ulang gambar.';
-                        $message_type = 'warning';
-                    } else {
-                        $message = 'Armada berhasil ditambahkan!';
-                        $message_type = 'success';
-                    }
+                    $message = !empty($image_path) ? 'Armada berhasil ditambahkan!' : 'Armada berhasil ditambahkan! (Belum ada gambar)';
+                    $message_type = 'success';
                 } catch(PDOException $e) {
-                    error_log("Error inserting armada: " . $e->getMessage());
                     $message = 'Error: Gagal menyimpan data armada. ' . $e->getMessage();
                     $message_type = 'danger';
                 }
             } else {
-                // Update
-                // Set image_path: gunakan yang baru jika ada, atau pertahankan yang lama
-                $final_image_path = !empty($image_path) ? $image_path : null;
-                if (empty($final_image_path) && $action == 'update' && !empty($_POST['id'])) {
-                    // Pertahankan image_path yang lama jika tidak ada upload baru
-                    try {
-                        $stmt_check = $conn->prepare("SELECT image_path FROM armada WHERE id = ?");
-                        $stmt_check->execute([$id]);
-                        $existing = $stmt_check->fetch(PDO::FETCH_ASSOC);
-                        if ($existing && !empty($existing['image_path'])) {
-                            $final_image_path = $existing['image_path'];
-                        }
-                    } catch(PDOException $e) {
-                        error_log("Error getting existing image_path: " . $e->getMessage());
-                    }
-                }
-                
+                // Update - sederhana
                 try {
-                    $stmt = $conn->prepare("UPDATE armada SET name = ?, capacity = ?, slug = ?, image_path = ?, media_key = ?, features = ?, description = ?, sort_order = ?, is_active = ? WHERE id = ?");
-                    $stmt->execute([$name, $capacity, $slug, $final_image_path, $media_key, $features_json, $description, $sort_order, $is_active, $id]);
-                    
-                    // Jika upload file tapi image_path kosong, tambahkan warning
-                    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK && empty($image_path)) {
-                        $message = 'Armada berhasil diupdate, tapi gambar tidak tersimpan. Silakan upload ulang gambar.';
-                        $message_type = 'warning';
+                    // Jika ada image_path baru, update. Jika tidak, pertahankan yang lama.
+                    if (!empty($image_path)) {
+                        $stmt = $conn->prepare("UPDATE armada SET name = ?, capacity = ?, slug = ?, image_path = ?, features = ?, description = ?, is_active = ? WHERE id = ?");
+                        $stmt->execute([$name, $capacity, $slug, $image_path, $features_json, $description, $is_active, $id]);
                     } else {
-                        $message = 'Armada berhasil diupdate!';
-                        $message_type = 'success';
+                        // Tidak update image_path jika kosong (pertahankan yang lama)
+                        $stmt = $conn->prepare("UPDATE armada SET name = ?, capacity = ?, slug = ?, features = ?, description = ?, is_active = ? WHERE id = ?");
+                        $stmt->execute([$name, $capacity, $slug, $features_json, $description, $is_active, $id]);
                     }
+                    
+                    $message = 'Armada berhasil diupdate!';
+                    $message_type = 'success';
                 } catch(PDOException $e) {
-                    error_log("Error updating armada: " . $e->getMessage());
                     $message = 'Error: Gagal mengupdate data armada. ' . $e->getMessage();
                     $message_type = 'danger';
                 }
@@ -385,35 +224,7 @@ include __DIR__ . '/includes/header.php';
                     <div class="col-md-6 col-lg-4">
                         <div class="card h-100 shadow-sm" style="border: 1px solid #e5e7eb;">
                             <?php 
-                            // Cari image source dengan berbagai fallback
-                            $image_src = null;
-                            
-                            // Prioritas 1: gunakan image_path dari armada table
-                            if (!empty($armada['image_path'])) {
-                                $path = ltrim($armada['image_path'], '/');
-                                // Pastikan path relatif dari root (uploads/media/...)
-                                // Untuk display dari admin folder, tambahkan ../
-                                if (strpos($path, '../') === 0) {
-                                    // Sudah ada ../, gunakan langsung
-                                    $image_src = $path;
-                                } else {
-                                    // Tambahkan ../ untuk akses dari admin folder
-                                    $image_src = '../' . $path;
-                                }
-                            }
-                            
-                            // Prioritas 2: jika tidak ada image_path, coba dari media table via media_key
-                            if (empty($image_src) && !empty($armada['media_key'])) {
-                                $media = getMediaByKey($armada['media_key']);
-                                if ($media && !empty($media['file_path'])) {
-                                    $path = ltrim($media['file_path'], '/');
-                                    if (strpos($path, '../') === 0) {
-                                        $image_src = $path;
-                                    } else {
-                                        $image_src = '../' . $path;
-                                    }
-                                }
-                            }
+                            $image_src = getArmadaImageSrc($armada['image_path'] ?? '');
                             ?>
                             <?php if ($image_src): ?>
                                 <img src="<?php echo htmlspecialchars($image_src); ?>" 
@@ -505,60 +316,25 @@ include __DIR__ . '/includes/header.php';
                                    placeholder="Contoh: 59 Kursi">
                         </div>
                         
-                        <div class="col-md-6">
-                            <label class="form-label">Slug (URL)</label>
-                            <input type="text" name="slug" class="form-control"
-                                   value="<?php echo htmlspecialchars($edit_data['slug'] ?? ''); ?>"
-                                   placeholder="Akan dibuat otomatis jika kosong">
-                            <small class="text-muted">Format: big-bus-59-kursi</small>
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <label class="form-label">Urutan Tampil</label>
-                            <input type="number" name="sort_order" class="form-control"
-                                   value="<?php echo $edit_data['sort_order'] ?? 0; ?>" min="0">
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <label class="form-label">Media Key</label>
-                            <input type="text" name="media_key" class="form-control"
-                                   value="<?php echo htmlspecialchars($edit_data['media_key'] ?? ''); ?>"
-                                   placeholder="Contoh: armada_big_bus">
-                            <small class="text-muted">Key untuk referensi media</small>
-                        </div>
-                        
                         <div class="col-md-12">
                             <label class="form-label">Gambar Armada</label>
                             <input type="file" name="image" class="form-control" accept="image/*">
                             <?php if ($edit_data && !empty($edit_data['image_path'])): 
-                                $edit_img_src = null;
-                                $rel_path = '../' . ltrim($edit_data['image_path'], '/');
-                                $abs_path = __DIR__ . '/../' . ltrim($edit_data['image_path'], '/');
-                                
-                                if (file_exists($rel_path)) {
-                                    $edit_img_src = $rel_path;
-                                } elseif (file_exists($abs_path)) {
-                                    $edit_img_src = $rel_path;
-                                } elseif (file_exists($edit_data['image_path'])) {
-                                    $edit_img_src = '../' . ltrim($edit_data['image_path'], '/');
-                                }
+                                $edit_img_src = '../' . ltrim($edit_data['image_path'], '/');
                             ?>
-                                <small class="text-muted d-block mt-1">
-                                    Gambar saat ini: <code><?php echo htmlspecialchars($edit_data['image_path']); ?></code>
-                                    <?php if ($edit_img_src): ?>
-                                        <a href="<?php echo htmlspecialchars($edit_img_src); ?>" target="_blank" class="ms-2">Lihat</a>
-                                    <?php else: ?>
-                                        <span class="text-danger ms-2">(File tidak ditemukan)</span>
-                                    <?php endif; ?>
+                                <small class="text-muted d-block mt-2">
+                                    Gambar saat ini:
                                 </small>
-                                <?php if ($edit_img_src): ?>
-                                    <img src="<?php echo htmlspecialchars($edit_img_src); ?>" 
-                                         class="img-thumbnail mt-2" 
-                                         style="max-width: 200px; max-height: 150px;"
-                                         onerror="this.style.display='none';">
-                                <?php endif; ?>
+                                <img src="<?php echo htmlspecialchars($edit_img_src); ?>" 
+                                     class="img-thumbnail mt-2" 
+                                     style="max-width: 200px; max-height: 150px; object-fit: cover;"
+                                     onerror="this.style.display='none';">
+                                <small class="text-muted d-block mt-1">
+                                    Upload file baru untuk mengganti gambar
+                                </small>
+                            <?php else: ?>
+                                <small class="text-muted d-block mt-1">Format: JPG, PNG, GIF, WebP. Maksimal 5MB</small>
                             <?php endif; ?>
-                            <small class="text-muted d-block mt-1">Format: JPG, PNG, GIF, WebP. Max: 5MB</small>
                         </div>
                         
                         <div class="col-md-12">
