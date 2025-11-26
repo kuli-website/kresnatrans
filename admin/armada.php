@@ -312,9 +312,12 @@ if (isset($_GET['edit'])) {
 // Get all armada
 try {
     $armada_list = $conn->query("SELECT * FROM armada ORDER BY sort_order ASC, name ASC")->fetchAll(PDO::FETCH_ASSOC);
-    foreach ($armada_list as &$armada) {
-        $armada['features'] = json_decode($armada['features'] ?? '[]', true) ?: [];
-    }
+    // CRITICAL FIX: Jangan gunakan reference (&) karena akan membuat semua item merujuk ke item terakhir setelah loop!
+    // Gunakan array_map atau loop tanpa reference
+    $armada_list = array_map(function($armada_item) {
+        $armada_item['features'] = json_decode($armada_item['features'] ?? '[]', true) ?: [];
+        return $armada_item;
+    }, $armada_list);
 } catch(PDOException $e) {
     $armada_list = [];
     if (strpos($e->getMessage(), "doesn't exist") !== false) {
