@@ -1099,7 +1099,7 @@ section {
     .hero-image-wrapper {
         margin-top: 0;
         margin-bottom: 1.5rem;
-        width: 50px;
+        width: 0px;
     }
     
     .scroll-indicator {
