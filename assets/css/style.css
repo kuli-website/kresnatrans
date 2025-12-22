@@ -388,7 +388,7 @@ position: absolute;
 }
 
 .hero-image {
-    width: 100%;
+    width: 50%;
     height: auto;
     filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.3));
 }
