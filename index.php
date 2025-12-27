@@ -166,6 +166,13 @@
                     <li class="nav-item">
                         <a href="#contact" class="nav-link btn-cta">Booking</a>
                     </li>
+                    <li class="nav-item d-flex align-items-center">
+                        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark/light mode">
+                            <span class="theme-toggle-icon">
+                                <i class="fas fa-sun"></i>
+                            </span>
+                        </button>
+                    </li>
                 </ul>
             </div>
         </div>
