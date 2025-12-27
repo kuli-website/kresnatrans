@@ -836,18 +836,18 @@ section {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.75rem;
 }
 
 .testimonial-rating {
     display: flex;
-    gap: 0.25rem;
-    color: #FFB800;
-    font-size: 1.1rem;
+    gap: 0.2rem;
+    color: var(--primary-color);
+    font-size: 1.15rem;
 }
 
 .testimonial-rating .fas.fa-star {
-    color: #FFB800;
+    color: var(--primary-color);
 }
 
 .testimonial-rating .far.fa-star {
@@ -856,30 +856,37 @@ section {
 
 .testimonial-quote {
     color: var(--primary-color);
-    opacity: 0.1;
-    font-size: 3rem;
+    opacity: 0.12;
+    font-size: 5.5rem;
     line-height: 1;
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    z-index: 0;
 }
 
 .testimonial-body {
     flex-grow: 1;
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 1;
 }
 
 .testimonial-text {
-    color: var(--text-gray);
+    color: var(--text-dark);
     font-size: 0.95rem;
-    line-height: 1.7;
+    line-height: 1.75;
     margin: 0;
-    font-style: italic;
+    font-weight: 400;
 }
 
 .testimonial-footer {
     display: flex;
     align-items: center;
     gap: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--border-color);
+    padding-top: 0;
+    border-top: none;
+    margin-top: auto;
 }
 
 .testimonial-avatar {
@@ -896,6 +903,7 @@ section {
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
 }
 
 .avatar-placeholder {
@@ -905,7 +913,7 @@ section {
 }
 
 .avatar-img {
-    border: 3px solid var(--primary-color);
+    border: none;
 }
 
 .testimonial-info {
@@ -916,26 +924,27 @@ section {
     font-size: 1rem;
     font-weight: 700;
     color: var(--text-dark);
-    margin: 0 0 0.25rem 0;
+    margin: 0 0 0.15rem 0;
+    line-height: 1.4;
 }
 
 .testimonial-location {
-    color: var(--text-gray);
+    color: var(--text-light);
     font-size: 0.875rem;
     margin: 0;
-    display: flex;
-    align-items: center;
+    display: block;
+    line-height: 1.4;
 }
 
 .testimonial-location i {
-    font-size: 0.75rem;
-    margin-right: 0.25rem;
+    display: none;
 }
 
 .testimonial-company {
     color: var(--text-light);
-    font-size: 0.8rem;
-    margin: 0.25rem 0 0 0;
+    font-size: 0.875rem;
+    margin: 0;
+    line-height: 1.4;
 }
 
 /* Responsive adjustments for testimonials */

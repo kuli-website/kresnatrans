@@ -601,16 +601,10 @@
                             </div>
                             <div class="testimonial-info">
                                 <h5 class="testimonial-name"><?php echo htmlspecialchars($testimonial['name'] ?? '', ENT_QUOTES, 'UTF-8'); ?></h5>
-                                <?php if (!empty($testimonial['location'])): ?>
-                                    <p class="testimonial-location">
-                                        <i class="fas fa-map-marker-alt me-1"></i>
-                                        <?php echo htmlspecialchars($testimonial['location'], ENT_QUOTES, 'UTF-8'); ?>
-                                    </p>
-                                <?php endif; ?>
                                 <?php if (!empty($testimonial['company'])): ?>
-                                    <p class="testimonial-company">
-                                        <small><?php echo htmlspecialchars($testimonial['company'], ENT_QUOTES, 'UTF-8'); ?></small>
-                                    </p>
+                                    <p class="testimonial-company"><?php echo htmlspecialchars($testimonial['company'], ENT_QUOTES, 'UTF-8'); ?></p>
+                                <?php elseif (!empty($testimonial['location'])): ?>
+                                    <p class="testimonial-location"><?php echo htmlspecialchars($testimonial['location'], ENT_QUOTES, 'UTF-8'); ?></p>
                                 <?php endif; ?>
                             </div>
                         </div>
