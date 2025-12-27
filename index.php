@@ -158,6 +158,9 @@
                         <a class="nav-link" href="#packages">Paket</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="#testimonials">Testimoni</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="#contact">Kontak</a>
                     </li>
                     <li class="nav-item">
@@ -501,6 +504,129 @@
         </div>
     </section>
 
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="testimonials-section py-5">
+        <div class="container">
+            <div class="text-center mb-5" data-aos="fade-up">
+                <span class="section-label">Testimoni Pelanggan</span>
+                <h2 class="section-title">Apa Kata Pelanggan Kami</h2>
+                <p class="section-description mx-auto">Lihat pengalaman pelanggan yang telah menggunakan layanan sewa bus Jogja kami. Kami berkomitmen memberikan pelayanan terbaik untuk kepuasan Anda.</p>
+            </div>
+            
+            <?php
+            // Get testimonials from database
+            $testimonials_list = [];
+            try {
+                if (isset($conn) && $conn !== null) {
+                    $testimonials_query = $conn->query("SELECT * FROM testimonials WHERE is_active = 1 ORDER BY sort_order ASC, created_at DESC LIMIT 6");
+                    $testimonials_list = $testimonials_query->fetchAll(PDO::FETCH_ASSOC);
+                }
+            } catch(PDOException $e) {
+                // Fallback jika tabel belum ada
+                $testimonials_list = [];
+            }
+            
+            // Fallback sample data jika database kosong
+            if (empty($testimonials_list)) {
+                $testimonials_list = [
+                    [
+                        'id' => 1,
+                        'name' => 'Budi Santoso',
+                        'rating' => 5,
+                        'testimonial' => 'Pelayanan sangat memuaskan! Busnya nyaman, AC dingin, dan sopirnya ramah. Perjalanan dari Jogja ke Malang sangat lancar. Recommended!',
+                        'location' => 'Yogyakarta',
+                        'photo' => null
+                    ],
+                    [
+                        'id' => 2,
+                        'name' => 'Siti Nurhaliza',
+                        'rating' => 5,
+                        'testimonial' => 'Armada busnya bagus dan terawat dengan baik. Fasilitas lengkap, ada toilet, LCD TV, dan reclining seat. Harga juga terjangkau. Puas sekali!',
+                        'location' => 'Surabaya',
+                        'photo' => null
+                    ],
+                    [
+                        'id' => 3,
+                        'name' => 'Ahmad Hidayat',
+                        'rating' => 4,
+                        'testimonial' => 'Overall pengalaman baik. Bus tepat waktu, sopir profesional. Mungkin untuk kedepannya bisa ditambahkan WiFi. Tetap recommended!',
+                        'location' => 'Jakarta',
+                        'photo' => null
+                    ]
+                ];
+            }
+            
+            if (!empty($testimonials_list)):
+            ?>
+            <div class="row g-4">
+                <?php foreach ($testimonials_list as $index => $testimonial): 
+                    $rating = intval($testimonial['rating'] ?? 5);
+                    $photo = !empty($testimonial['photo']) ? $testimonial['photo'] : null;
+                ?>
+                <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="<?php echo $index * 100; ?>">
+                    <div class="testimonial-card">
+                        <div class="testimonial-header">
+                            <div class="testimonial-rating">
+                                <?php 
+                                // Display stars
+                                for ($i = 1; $i <= 5; $i++): 
+                                    if ($i <= $rating):
+                                ?>
+                                    <i class="fas fa-star"></i>
+                                <?php else: ?>
+                                    <i class="far fa-star"></i>
+                                <?php 
+                                    endif;
+                                endfor; 
+                                ?>
+                            </div>
+                            <div class="testimonial-quote">
+                                <i class="fas fa-quote-right"></i>
+                            </div>
+                        </div>
+                        <div class="testimonial-body">
+                            <p class="testimonial-text"><?php echo htmlspecialchars($testimonial['testimonial'] ?? '', ENT_QUOTES, 'UTF-8'); ?></p>
+                        </div>
+                        <div class="testimonial-footer">
+                            <div class="testimonial-avatar">
+                                <?php if ($photo && file_exists(ltrim($photo, '/'))): ?>
+                                    <img src="<?php echo htmlspecialchars($photo, ENT_QUOTES, 'UTF-8'); ?>" 
+                                         alt="<?php echo htmlspecialchars($testimonial['name'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+                                         class="avatar-img">
+                                <?php else: ?>
+                                    <div class="avatar-placeholder">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                            <div class="testimonial-info">
+                                <h5 class="testimonial-name"><?php echo htmlspecialchars($testimonial['name'] ?? '', ENT_QUOTES, 'UTF-8'); ?></h5>
+                                <?php if (!empty($testimonial['location'])): ?>
+                                    <p class="testimonial-location">
+                                        <i class="fas fa-map-marker-alt me-1"></i>
+                                        <?php echo htmlspecialchars($testimonial['location'], ENT_QUOTES, 'UTF-8'); ?>
+                                    </p>
+                                <?php endif; ?>
+                                <?php if (!empty($testimonial['company'])): ?>
+                                    <p class="testimonial-company">
+                                        <small><?php echo htmlspecialchars($testimonial['company'], ENT_QUOTES, 'UTF-8'); ?></small>
+                                    </p>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+            <?php else: ?>
+            <div class="text-center py-5">
+                <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                <p class="text-muted">Belum ada testimoni. Testimoni akan muncul di sini.</p>
+            </div>
+            <?php endif; ?>
+        </div>
+    </section>
+
     <!-- Contact Section -->
     <section id="contact" class="contact-section py-5">
         <div class="container">
@@ -651,6 +777,7 @@
                             <li><a href="#about">Tentang</a></li>
                             <li><a href="#armada">Armada</a></li>
                             <li><a href="#packages">Paket</a></li>
+                            <li><a href="#testimonials">Testimoni</a></li>
                             <li><a href="#contact">Kontak</a></li>
                         </ul>
                     </div>
