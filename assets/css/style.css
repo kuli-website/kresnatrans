@@ -149,6 +149,12 @@ a {
     max-width: 100px; 
     object-fit: contain;
     display: block;
+    transition: filter 0.3s ease;
+}
+
+/* Make logo white in dark mode */
+[data-theme="dark"] .navbar-logo {
+    filter: brightness(0) invert(1);
 }
 
 .navbar-toggler {
