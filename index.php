@@ -438,7 +438,7 @@
     </section>
 
     <!-- Packages Section -->
-    <section id="packages" class="packages-section py-5">
+    <!-- <section id="packages" class="packages-section py-5">
         <div class="container">
             <div class="text-center mb-5" data-aos="fade-up">
                 <span class="section-label">Paket Sewa</span>
@@ -516,7 +516,7 @@
                 </div>
             </div>
         </div>
-    </section>
+    </section> -->
 
     <!-- Testimonials Section -->
     <section id="testimonials" class="testimonials-section py-5">
