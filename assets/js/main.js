@@ -66,6 +66,7 @@ window.addEventListener('DOMContentLoaded', function() {
 // Dark Mode Toggle
 (function() {
     const themeToggle = document.getElementById('themeToggle');
+    const themeToggleMobile = document.getElementById('themeToggleMobile');
     const html = document.documentElement;
     
     // Get saved theme preference or default to light
@@ -74,38 +75,48 @@ window.addEventListener('DOMContentLoaded', function() {
     // Apply saved theme
     if (currentTheme === 'dark') {
         html.setAttribute('data-theme', 'dark');
-        updateToggleIcon(true);
+        updateToggleIcons(true);
     } else {
         html.setAttribute('data-theme', 'light');
-        updateToggleIcon(false);
+        updateToggleIcons(false);
     }
     
-    // Function to update toggle icon
-    function updateToggleIcon(isDark) {
-        if (themeToggle) {
-            const icon = themeToggle.querySelector('i');
-            if (icon) {
-                if (isDark) {
-                    icon.classList.remove('fa-sun');
-                    icon.classList.add('fa-moon');
-                } else {
-                    icon.classList.remove('fa-moon');
-                    icon.classList.add('fa-sun');
+    // Function to update toggle icons (both desktop and mobile)
+    function updateToggleIcons(isDark) {
+        const toggles = [themeToggle, themeToggleMobile];
+        toggles.forEach(toggle => {
+            if (toggle) {
+                const icon = toggle.querySelector('i');
+                if (icon) {
+                    if (isDark) {
+                        icon.classList.remove('fa-sun');
+                        icon.classList.add('fa-moon');
+                    } else {
+                        icon.classList.remove('fa-moon');
+                        icon.classList.add('fa-sun');
+                    }
                 }
             }
-        }
+        });
     }
     
-    // Toggle theme on button click
+    // Function to handle theme toggle
+    function toggleTheme() {
+        const currentTheme = html.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        
+        html.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateToggleIcons(newTheme === 'dark');
+    }
+    
+    // Add event listeners to both toggle buttons
     if (themeToggle) {
-        themeToggle.addEventListener('click', function() {
-            const currentTheme = html.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            
-            html.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            updateToggleIcon(newTheme === 'dark');
-        });
+        themeToggle.addEventListener('click', toggleTheme);
+    }
+    
+    if (themeToggleMobile) {
+        themeToggleMobile.addEventListener('click', toggleTheme);
     }
     
     // Detect system preference on first visit (if no saved preference)
@@ -114,7 +125,7 @@ window.addEventListener('DOMContentLoaded', function() {
         if (prefersDark) {
             html.setAttribute('data-theme', 'dark');
             localStorage.setItem('theme', 'dark');
-            updateToggleIcon(true);
+            updateToggleIcons(true);
         }
     }
 })();

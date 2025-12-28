@@ -140,9 +140,16 @@
             <a class="navbar-brand" href="#home">
                 <?php echo getMediaImage('logo_navbar', 'img/logobus.png', 'Sewa Bus Jogja - Rental Bus Yogyakarta', 'navbar-logo'); ?>
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+            <div class="d-flex align-items-center gap-2">
+                <button class="theme-toggle d-lg-none" id="themeToggleMobile" aria-label="Toggle dark mode" title="Toggle dark/light mode">
+                    <span class="theme-toggle-icon">
+                        <i class="fas fa-sun"></i>
+                    </span>
+                </button>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
@@ -166,7 +173,7 @@
                     <li class="nav-item">
                         <a href="#contact" class="nav-link btn-cta">Booking</a>
                     </li>
-                    <li class="nav-item d-flex align-items-center">
+                    <li class="nav-item d-none d-lg-flex align-items-center">
                         <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark/light mode">
                             <span class="theme-toggle-icon">
                                 <i class="fas fa-sun"></i>
