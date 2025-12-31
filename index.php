@@ -187,49 +187,89 @@
 
     <!-- Hero Section -->
     <section id="home" class="hero-section">
-        <div class="hero-overlay"></div>
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-7" data-aos="fade-up" data-aos-duration="1000">
-                    <span class="hero-badge">Layanan Terpercaya Sejak 2010</span>
-                    <h1 class="hero-title">Sewa Bus Jogja Premium untuk Perjalanan Anda</h1>
-                    <p class="hero-subtitle">Nikmati perjalanan yang nyaman, aman, dan tak terlupakan dengan armada bus terbaru dan driver profesional. Melayani sewa bus pariwisata, wisata, dinas, dan acara keluarga di Yogyakarta dan sekitarnya. Rental bus murah dengan kualitas premium.</p>
-                    <div class="hero-features">
-                        <div class="feature-item">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Armada Modern & Terawat</span>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Driver Berpengalaman</span>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Harga Terjangkau</span>
-                        </div>
+        <div class="hero-background">
+            <!-- Background bus image -->
+            <?php 
+            $hero_bg_image = getMediaUrl('hero_bus_image', '');
+            if (empty($hero_bg_image)) {
+                $hero_bg_image = 'img/bus1.png';
+            }
+            ?>
+            <div class="hero-bus-image" style="background-image: url('<?php echo htmlspecialchars($hero_bg_image); ?>');"></div>
+            <div class="hero-overlay"></div>
+        </div>
+        <div class="container hero-container">
+            <div class="hero-content-wrapper">
+                <!-- Progress Indicator -->
+                <div class="hero-progress-indicator">
+                    <div class="progress-step active">
+                        <div class="step-number">1</div>
+                        <div class="step-line"></div>
                     </div>
-                    <div class="hero-buttons mt-4">
-                        <a href="https://wa.me/6282371869118?text=Halo%20kak%2C%20saya%20mau%20tanya%20tanya%20tentang%20sewa%20bus%20nya" 
-                           target="_blank" 
-                           class="btn btn-whatsapp btn-lg me-3">
-                            <i class="fab fa-whatsapp me-2"></i>Hubungi via WhatsApp
-                        </a>
-                        <a href="#armada" class="btn btn-outline-light btn-lg">
-                            Lihat Armada
-                        </a>
+                    <div class="progress-step">
+                        <div class="step-number">2</div>
+                        <div class="step-line"></div>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-number">3</div>
                     </div>
                 </div>
-                <div class="col-lg-5" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
-                    <div class="hero-image-wrapper">
-                        <?php echo getMediaImage('hero_image', 'img/KRESNALOGO.png', 'Sewa Bus Jogja - Armada Bus Premium untuk Rental Bus Yogyakarta', 'img-fluid hero-image', ['loading' => 'eager', 'width' => '600px', 'height' => '400px']); ?>
+
+                <!-- Main Content -->
+                <div class="hero-main-content">
+                    <span class="hero-badge">ELEVATE YOUR TRAVEL JOURNEY</span>
+                    <h1 class="hero-title">Experience The Magic Of Bus Travel!</h1>
+                    <div class="hero-buttons">
+                        <a href="https://wa.me/6282371869118?text=Halo%20kak%2C%20saya%20mau%20tanya%20tanya%20tentang%20sewa%20bus%20nya" 
+                           target="_blank" 
+                           class="btn btn-primary btn-lg hero-cta-btn">
+                            Book A Trip Now
+                        </a>
+                        <button class="btn-play" aria-label="Play video">
+                            <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Info Card -->
+                <div class="hero-info-card">
+                    <div class="info-card-header">
+                        <span>Know More</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                    <div class="info-card-images">
+                        <div class="info-image-item">
+                            <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=100&h=100&fit=crop" alt="Destination 1">
+                        </div>
+                        <div class="info-image-item">
+                            <img src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=100&h=100&fit=crop" alt="Destination 2">
+                        </div>
+                        <div class="info-image-item">
+                            <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=100&h=100&fit=crop" alt="Destination 3">
+                        </div>
+                    </div>
+                    <div class="info-card-description">
+                        <strong>Awesome Places</strong> Discover The World One Adventure At A Time!
                     </div>
                 </div>
             </div>
         </div>
-        <div class="scroll-indicator">
-            <a href="#about" class="scroll-down">
-                <i class="fas fa-chevron-down"></i>
-            </a>
+
+        <!-- Social Links Footer -->
+        <div class="hero-footer">
+            <div class="hero-social-links">
+                <span>Follow</span>
+                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+            </div>
+            <div class="hero-partners">
+                <span>airbnb</span>
+                <span>Booking.com</span>
+                <span>trivago</span>
+                <span>Expedia</span>
+            </div>
         </div>
     </section>
 
