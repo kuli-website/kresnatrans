@@ -395,19 +395,37 @@ a {
 .hero-image-wrapper {
     position: relative;
     padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.hero-bus-image-container {
+.hero-bus-image-container,
+.hero-logo-container {
     position: relative;
     z-index: 2;
     animation: floatImage 6s ease-in-out infinite;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.hero-bus-image-container img {
+.hero-bus-image-container img,
+.hero-logo-container img {
     width: 100%;
     height: auto;
+    max-width: 500px;
     max-height: 350px;
     object-fit: contain;
+}
+
+.hero-logo {
+    filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.1));
+}
+
+/* Dark mode logo adjustment */
+[data-theme="dark"] .hero-logo {
+    filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3));
 }
 
 @keyframes floatImage {
@@ -512,8 +530,10 @@ a {
         margin-top: 2rem;
     }
     
-    .hero-bus-image-container img {
+    .hero-bus-image-container img,
+    .hero-logo-container img {
         max-height: 280px;
+        max-width: 400px;
     }
     
     .hero-decoration {
@@ -538,8 +558,10 @@ a {
         font-size: 1.25rem;
     }
     
-    .hero-bus-image-container img {
+    .hero-bus-image-container img,
+    .hero-logo-container img {
         max-height: 250px;
+        max-width: 350px;
     }
 }
 
@@ -565,8 +587,10 @@ a {
         padding: 0.5rem;
     }
     
-    .hero-bus-image-container img {
+    .hero-bus-image-container img,
+    .hero-logo-container img {
         max-height: 200px;
+        max-width: 280px;
     }
 }
 

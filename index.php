@@ -274,8 +274,8 @@
                 
                 <div class="col-lg-6" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
                     <div class="hero-image-wrapper position-relative">
-                        <div class="hero-bus-image-container">
-                            <?php echo getMediaImage('hero_image', 'img/bus1.png', 'Sewa Bus Jogja - Armada Bus Premium untuk Rental Bus Yogyakarta', 'img-fluid rounded-4 shadow-lg', ['loading' => 'eager']); ?>
+                        <div class="hero-logo-container">
+                            <?php echo getMediaImage('logo_navbar', 'img/logobus.png', 'Sewa Bus Jogja - Rental Bus Yogyakarta', 'img-fluid hero-logo', ['loading' => 'eager']); ?>
                         </div>
                         <!-- Decorative elements -->
                         <div class="hero-decoration hero-decoration-1"></div>
