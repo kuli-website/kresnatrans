@@ -189,83 +189,83 @@
     <section id="home" class="hero-section">
         <div class="hero-background-overlay"></div>
         <div class="container">
-            <div class="row align-items-center min-vh-100 py-5">
-                <div class="col-lg-6 mb-5 mb-lg-0" data-aos="fade-right" data-aos-duration="1000">
-                    <span class="badge bg-primary-subtle text-primary px-3 py-2 mb-3 d-inline-block rounded-pill">
-                        <i class="fas fa-star me-2"></i>Layanan Terpercaya Sejak 2010
+            <div class="row align-items-center hero-row py-4">
+                <div class="col-lg-6 mb-4 mb-lg-0" data-aos="fade-right" data-aos-duration="1000">
+                    <span class="badge bg-primary-subtle text-primary px-2 py-1 mb-2 d-inline-block rounded-pill hero-badge-small">
+                        <i class="fas fa-star me-1"></i>Layanan Terpercaya Sejak 2010
                     </span>
-                    <h1 class="display-3 fw-bold mb-4 text-dark">
+                    <h1 class="hero-title-compact fw-bold mb-3 text-dark">
                         Sewa Bus Jogja <span class="text-primary">Premium</span> untuk Perjalanan Anda
                     </h1>
-                    <p class="lead text-muted mb-4">
+                    <p class="hero-subtitle-compact text-muted mb-3">
                         Nikmati perjalanan yang nyaman, aman, dan tak terlupakan dengan armada bus terbaru dan driver profesional. Melayani sewa bus pariwisata, wisata, dinas, dan acara keluarga di Yogyakarta.
                     </p>
                     
                     <!-- Hero Features -->
-                    <div class="row g-3 mb-4">
+                    <div class="row g-2 mb-3">
                         <div class="col-md-6">
                             <div class="d-flex align-items-center">
-                                <div class="hero-feature-icon me-3">
+                                <div class="hero-feature-icon-small me-2">
                                     <i class="fas fa-check-circle text-primary"></i>
                                 </div>
-                                <span class="text-dark">Armada Modern & Terawat</span>
+                                <span class="text-dark small">Armada Modern & Terawat</span>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="d-flex align-items-center">
-                                <div class="hero-feature-icon me-3">
+                                <div class="hero-feature-icon-small me-2">
                                     <i class="fas fa-check-circle text-primary"></i>
                                 </div>
-                                <span class="text-dark">Driver Berpengalaman</span>
+                                <span class="text-dark small">Driver Berpengalaman</span>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="d-flex align-items-center">
-                                <div class="hero-feature-icon me-3">
+                                <div class="hero-feature-icon-small me-2">
                                     <i class="fas fa-check-circle text-primary"></i>
                                 </div>
-                                <span class="text-dark">Harga Terjangkau</span>
+                                <span class="text-dark small">Harga Terjangkau</span>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="d-flex align-items-center">
-                                <div class="hero-feature-icon me-3">
+                                <div class="hero-feature-icon-small me-2">
                                     <i class="fas fa-check-circle text-primary"></i>
                                 </div>
-                                <span class="text-dark">Layanan 24/7</span>
+                                <span class="text-dark small">Layanan 24/7</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- CTA Buttons -->
-                    <div class="d-flex flex-wrap gap-3 mb-4">
+                    <div class="d-flex flex-wrap gap-2 mb-3">
                         <a href="https://wa.me/6282371869118?text=Halo%20kak%2C%20saya%20mau%20tanya%20tanya%20tentang%20sewa%20bus%20nya" 
                            target="_blank" 
-                           class="btn btn-primary btn-lg px-4 py-3 rounded-pill">
+                           class="btn btn-primary px-3 py-2 rounded-pill hero-btn-compact">
                             <i class="fab fa-whatsapp me-2"></i>Hubungi via WhatsApp
                         </a>
-                        <a href="#armada" class="btn btn-outline-primary btn-lg px-4 py-3 rounded-pill">
+                        <a href="#armada" class="btn btn-outline-primary px-3 py-2 rounded-pill hero-btn-compact">
                             <i class="fas fa-bus me-2"></i>Lihat Armada
                         </a>
                     </div>
 
                     <!-- Stats -->
-                    <div class="row g-4 mt-5">
+                    <div class="row g-3 mt-3">
                         <div class="col-4">
                             <div class="text-center">
-                                <h3 class="fw-bold text-primary mb-1">500+</h3>
+                                <h4 class="fw-bold text-primary mb-0 hero-stat-number">500+</h4>
                                 <p class="small text-muted mb-0">Perjalanan</p>
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="text-center">
-                                <h3 class="fw-bold text-primary mb-1">50+</h3>
+                                <h4 class="fw-bold text-primary mb-0 hero-stat-number">50+</h4>
                                 <p class="small text-muted mb-0">Armada Bus</p>
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="text-center">
-                                <h3 class="fw-bold text-primary mb-1">100%</h3>
+                                <h4 class="fw-bold text-primary mb-0 hero-stat-number">100%</h4>
                                 <p class="small text-muted mb-0">Kepuasan</p>
                             </div>
                         </div>

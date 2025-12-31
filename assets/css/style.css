@@ -300,14 +300,18 @@ a {
 
 .hero-section {
     position: relative;
-    min-height: 100vh;
+    min-height: auto;
     background: linear-gradient(135deg, 
         rgba(245, 247, 250, 1) 0%,
         rgba(255, 255, 255, 1) 50%,
         rgba(245, 247, 250, 1) 100%
     );
     overflow: hidden;
-    padding: 8rem 0 4rem;
+    padding: 5rem 0 3rem;
+}
+
+.hero-row {
+    min-height: auto;
 }
 
 /* Background overlay pattern */
@@ -338,6 +342,46 @@ a {
     font-size: 1.25rem;
 }
 
+.hero-feature-icon-small {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+/* Compact Hero Title */
+.hero-title-compact {
+    font-size: 2.25rem;
+    line-height: 1.2;
+}
+
+/* Compact Hero Subtitle */
+.hero-subtitle-compact {
+    font-size: 1rem;
+    line-height: 1.6;
+    max-width: 600px;
+}
+
+/* Compact Hero Badge */
+.hero-badge-small {
+    font-size: 0.75rem;
+    padding: 0.375rem 0.75rem !important;
+}
+
+/* Compact Hero Buttons */
+.hero-btn-compact {
+    font-size: 0.9rem;
+    padding: 0.5rem 1.25rem !important;
+}
+
+/* Compact Hero Stats */
+.hero-stat-number {
+    font-size: 1.5rem;
+}
+
 /* Bootstrap Utility Override */
 .bg-primary-subtle {
     background-color: rgba(0, 31, 63, 0.1) !important;
@@ -350,7 +394,7 @@ a {
 /* Hero Image Wrapper */
 .hero-image-wrapper {
     position: relative;
-    padding: 2rem;
+    padding: 1rem;
 }
 
 .hero-bus-image-container {
@@ -362,7 +406,7 @@ a {
 .hero-bus-image-container img {
     width: 100%;
     height: auto;
-    max-height: 500px;
+    max-height: 350px;
     object-fit: contain;
 }
 
@@ -385,16 +429,16 @@ a {
 }
 
 .hero-decoration-1 {
-    width: 200px;
-    height: 200px;
+    width: 120px;
+    height: 120px;
     top: 0;
     right: 0;
     animation: pulseDecoration 4s ease-in-out infinite;
 }
 
 .hero-decoration-2 {
-    width: 150px;
-    height: 150px;
+    width: 100px;
+    height: 100px;
     bottom: 0;
     left: 0;
     animation: pulseDecoration 4s ease-in-out infinite 2s;
@@ -433,7 +477,9 @@ a {
 }
 
 [data-theme="dark"] .hero-section h1.text-dark,
-[data-theme="dark"] .hero-section .text-dark {
+[data-theme="dark"] .hero-section .text-dark,
+[data-theme="dark"] .hero-section h4.text-dark,
+[data-theme="dark"] .hero-section span.text-dark {
     color: #E5E7EB !important;
 }
 
@@ -450,16 +496,24 @@ a {
 /* Responsive Hero Section */
 @media (max-width: 991.98px) {
     .hero-section {
-        padding: 6rem 0 3rem;
+        padding: 4rem 0 2rem;
     }
     
-    .hero-section .display-3 {
-        font-size: 2.5rem;
+    .hero-title-compact {
+        font-size: 2rem;
+    }
+    
+    .hero-subtitle-compact {
+        font-size: 0.95rem;
     }
     
     .hero-image-wrapper {
-        padding: 1rem;
-        margin-top: 3rem;
+        padding: 0.75rem;
+        margin-top: 2rem;
+    }
+    
+    .hero-bus-image-container img {
+        max-height: 280px;
     }
     
     .hero-decoration {
@@ -469,39 +523,50 @@ a {
 
 @media (max-width: 767.98px) {
     .hero-section {
-        padding: 5rem 0 2rem;
-        min-height: auto;
+        padding: 3rem 0 2rem;
     }
     
-    .hero-section .display-3 {
-        font-size: 2rem;
+    .hero-title-compact {
+        font-size: 1.75rem;
     }
     
-    .hero-section .lead {
-        font-size: 1rem;
+    .hero-subtitle-compact {
+        font-size: 0.9rem;
+    }
+    
+    .hero-stat-number {
+        font-size: 1.25rem;
     }
     
     .hero-bus-image-container img {
-        max-height: 300px;
+        max-height: 250px;
     }
 }
 
 @media (max-width: 575.98px) {
     .hero-section {
-        padding: 4rem 0 2rem;
+        padding: 2.5rem 0 1.5rem;
     }
     
-    .hero-section .display-3 {
-        font-size: 1.75rem;
+    .hero-title-compact {
+        font-size: 1.5rem;
     }
     
-    .hero-section .btn-lg {
-        padding: 0.75rem 1.5rem;
-        font-size: 0.95rem;
+    .hero-subtitle-compact {
+        font-size: 0.85rem;
+    }
+    
+    .hero-btn-compact {
+        font-size: 0.85rem;
+        padding: 0.45rem 1rem !important;
     }
     
     .hero-image-wrapper {
         padding: 0.5rem;
+    }
+    
+    .hero-bus-image-container img {
+        max-height: 200px;
     }
 }
 
