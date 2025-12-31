@@ -421,11 +421,12 @@ a {
 
 .hero-logo {
     filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.1));
+    transition: filter 0.3s ease;
 }
 
-/* Dark mode logo adjustment */
+/* Dark mode logo - make white like navbar logo */
 [data-theme="dark"] .hero-logo {
-    filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3));
+    filter: brightness(0) invert(1) drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3));
 }
 
 @keyframes floatImage {
